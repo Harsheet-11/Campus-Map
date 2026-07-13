@@ -1,8 +1,14 @@
+import { NicknameCard } from "@/components/auth/NicknameCard";
 export default function OnboardingPage() {
   return (
-    <div className="text-white text-center p-8">
-      <h1 className="text-2xl font-bold">Onboarding</h1>
-      <p className="text-slate-400 mt-2">Coming in Phase 1</p>
+    <div className="
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      p-5
+      ">
+      <NicknameCard  />
     </div>
   );
 }
