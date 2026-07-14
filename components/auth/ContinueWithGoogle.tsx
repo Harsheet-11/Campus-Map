@@ -38,10 +38,8 @@ export default function ContinueWithGoogle() {
       mx-auto
       "
     >
-
-
       <Button
-        // onClick={login}
+        onClick={login}
         variant="outline"
         className="
         group

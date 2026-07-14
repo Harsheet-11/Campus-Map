@@ -1,6 +1,8 @@
 import { NicknameCard } from "@/components/auth/NicknameCard";
+// import ProfileIcon from "@/components/ProfileIcon";
 export default function OnboardingPage() {
   return (
+    <>
     <div className="
       min-h-screen
       flex
@@ -9,6 +11,9 @@ export default function OnboardingPage() {
       p-5
       ">
       <NicknameCard  />
+      
     </div>
+    {/* <ProfileIcon/> */}
+    </>
   );
 }

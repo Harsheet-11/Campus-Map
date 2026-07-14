@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const { pathname } = request.nextUrl;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,13 +26,20 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Reads JWT only — no DB hit
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  // ── Only hard-block: /admin ──────────────────────────────────
+  // Everything else including / is public.
+  // Auth is triggered by user actions, not route visits.
+  if (pathname.startsWith("/admin")) {
     if (!user) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
+    // Only DB query in the entire middleware, only on /admin/*
     const { data: profile } = await supabase
       .from("users")
       .select("role")
@@ -43,6 +51,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // ── Bounce logged-in users away from /login ──────────────────
+  // If they are already logged in, /login is pointless.
+  if (user && pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // ── Everything else → let through ───────────────────────────
   return supabaseResponse;
 }
 
