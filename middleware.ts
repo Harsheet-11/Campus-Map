@@ -1,3 +1,10 @@
+// Initialize Supabase on every request.
+// Figure out if the user is logged in.
+// Protect /admin.
+// Prevent logged-in users from visiting /login.
+// Allow everything else.
+
+
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -27,9 +34,8 @@ export async function middleware(request: NextRequest) {
   );
 
   // Reads JWT only — no DB hit
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const result = await supabase.auth.getUser();
+  const user = result.data.user;
 
   // ── Only hard-block: /admin ──────────────────────────────────
   // Everything else including / is public.

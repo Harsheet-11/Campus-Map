@@ -1,13 +1,13 @@
 import ContinueWithGoogle from "@/components/auth/ContinueWithGoogle";
 import GoogleOneTap from "@/components/auth/GoogleOneTap";
-import LoginErrorToast from "@/components/auth/LoginErrorToast";
+import LoginErrorToast from "@/components/toast/LoginErrorToast";
 
 export default function LoginPage() {
   return (
     <main
       className="
         relative
-        min-h-screen
+        h-screen
         overflow-hidden
         flex
         items-center
