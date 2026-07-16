@@ -1,8 +1,7 @@
-import { createServiceClient } from "@/lib/supabase/server";
+// Gets the logged-in user.
+// Returns null if the user is not authenticated.
 
-// Returns the authenticated user if a valid session exists.
-// Returns null if no session or session is invalid.
-// Used at the top of every protected API route.
+import { createServiceClient } from "@/lib/supabase/server";
 
 export async function requireAuth() {
   const supabase = createServiceClient();

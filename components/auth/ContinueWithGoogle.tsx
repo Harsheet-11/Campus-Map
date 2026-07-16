@@ -7,7 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 
 export default function ContinueWithGoogle() {
   const supabase = createClient();
-  
+
   const haptic = (duration: number) => {
     if ("vibrate" in navigator) {
       navigator.vibrate(duration);
@@ -45,7 +45,10 @@ export default function ContinueWithGoogle() {
       "
     >
       <Button
-        onClick={() => {haptic(8); login()}}
+        onClick={() => {
+          haptic(8);
+          login();
+        }}
         variant="outline"
         className="
         group

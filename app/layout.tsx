@@ -1,14 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Providers } from "@/providers";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
-
-const inter = Inter({ subsets: ["latin"] });
+import Providers from "@/providers";
 
 export const metadata: Metadata = {
-  title: "NITR Campus Map",
-  description: "The living map of NIT Rourkela campus life",
+  title: "NITR Campus",
+  description: "Your campus story starts here",
 };
 
 export default function RootLayout({
@@ -18,14 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <Providers>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-            }}
-          />
           {children}
         </Providers>
       </body>

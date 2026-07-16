@@ -1,9 +1,13 @@
-'use client'
+import { ReactNode } from "react";
 
 export default function MainLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="relative min-h-screen bg-[#F8EFD9]">
+      {children}
+    </div>
+  );
 }

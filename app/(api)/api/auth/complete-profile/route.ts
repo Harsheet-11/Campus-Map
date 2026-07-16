@@ -3,11 +3,7 @@ import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireAuth } from "@/lib/auth";
 
-// ── Validation schema ─────────────────────────────────────────
-// Must match DB constraints exactly:
-//   npc_name: 4-24 chars, ^[a-zA-Z0-9_]+$
-//   avatar: 1-8 chars
-//   roll_number_hash: 64 char sha256 hex string
+// Validate incoming profile data
 const Schema = z.object({
   nickname: z
     .string()
@@ -30,7 +26,7 @@ const Schema = z.object({
 
 export async function POST(request: NextRequest) {
 
-  // ── Step 1: must be logged in ────────────────────────────────
+  // 1. Check authentication
   const user = await requireAuth();
 
   if (!user) {
@@ -45,7 +41,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Step 2: parse request body ───────────────────────────────
+
+  // 2. Read request body
   let body: unknown;
 
   try {
@@ -62,14 +59,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Step 3: validate with Zod ────────────────────────────────
+
+  // 3. Validate input
   const result = Schema.safeParse(body);
 
   if (!result.success) {
     const issue = result.error.issues[0];
 
-    // map Zod issues to specific error codes
-    // so NicknameCard can show the right message
     if (issue.path[0] === "nickname") {
       if (issue.code === "too_small") {
         return NextResponse.json(
@@ -133,8 +129,8 @@ export async function POST(request: NextRequest) {
 
   const supabase = createServiceClient();
 
-  // ── Step 4: check if profile already exists ──────────────────
-  // this user already completed onboarding
+
+  // 4. Prevent duplicate profiles
   const { data: existingProfile } = await supabase
     .from("users")
     .select("id")
@@ -153,9 +149,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Step 5: check roll number uniqueness ─────────────────────
-  // DB has unique constraint but we check early
-  // to return a clean error before hitting the constraint
+
+  // 5. Prevent duplicate roll numbers
   const { data: existingRoll } = await supabase
     .from("users")
     .select("id")
@@ -174,9 +169,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Step 6: check nickname uniqueness ────────────────────────
-  // DB has unique constraint on npc_name
-  // check early for a clean error message
+
+  // 6. Prevent duplicate nicknames
   const { data: existingNickname } = await supabase
     .from("users")
     .select("id")
@@ -195,25 +189,24 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Step 7: insert user row ──────────────────────────────────
+
+  // 7. Create profile
   const { data: newUser, error: insertError } = await supabase
     .from("users")
     .insert({
       id:               user.id,
-      npc_name:         nickname,     // maps to npc_name column
+      npc_name:         nickname,     
       avatar:           avatar,
       roll_number_hash: roll_number_hash,
-      role:             "student",    // default, matches constraint
+      role:             "student",   
     })
     .select("id, npc_name, avatar, created_at")
     .single();
 
   if (insertError || !newUser) {
-    // 23505 = unique constraint violation
-    // means a race condition — two people grabbed the same
-    // nickname or roll number at the exact same moment
+    
     if (insertError?.code === "23505") {
-      // figure out which constraint was violated
+
       const isNickname =
         insertError.message.includes("npc_name");
 
@@ -232,8 +225,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 23514 = check constraint violation
-    // means npc_name failed the DB regex or length check
+
+    // Handle database conflicts and errors
     if (insertError?.code === "23514") {
       return NextResponse.json(
         {
@@ -260,9 +253,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Step 8: bake data into JWT metadata ──────────────────────
-  // this is the key step for zero-DB return visits
-  // future page loads read from JWT — never hit the DB
+
+  // Store profile data in JWT for faster future loads
   const { error: metaError } =
     await supabase.auth.admin.updateUserById(user.id, {
       user_metadata: {
@@ -273,14 +265,11 @@ export async function POST(request: NextRequest) {
     });
 
   if (metaError) {
-    // non-fatal — profile was created successfully
-    // only affects the fast path on return visits
-    // they will fall through to the one DB query instead
     console.error("JWT metadata update failed:", metaError);
   }
 
-  // ── Step 9: founding soul badge ──────────────────────────────
-  // silent — badge failure never blocks profile creation
+
+  // Add launch badge (non-blocking)
   const launchDate = process.env.LAUNCH_DATE;
 
   if (launchDate) {
@@ -304,10 +293,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ── Step 10: set has_profile cookie ──────────────────────────
-  // app/page.tsx reads this cookie on every return visit
-  // if found → skips the DB query entirely
-  // this is what makes return visits zero-DB
+  
+  // Mark profile as completed
   const response = NextResponse.json(
     {
       user: {
@@ -320,14 +307,73 @@ export async function POST(request: NextRequest) {
   );
 
   response.cookies.set("has_profile", "true", {
-    httpOnly: true,   // not readable by JS, safe from XSS
+    httpOnly: true,   
     secure:   process.env.NODE_ENV === "production",
     sameSite: "lax",
     path:     "/",
-    // no maxAge = session cookie
-    // cleared when browser closes
-    // app/page.tsx re-sets it on next login if missing
   });
 
   return response;
+}
+
+
+export async function GET() {
+
+  // 1. Check authentication
+  const user = await requireAuth();
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authentication required.",
+        },
+      },
+      { status: 401 }
+    );
+  }
+
+
+  // 2. Fetch profile
+  const supabase = createServiceClient();
+
+  const { data: profile, error } = await supabase
+    .from("users")
+    .select(
+      "id, npc_name, avatar, role"
+    )
+    .eq("id", user.id)
+    .single();
+
+
+  if (error || !profile) {
+
+    return NextResponse.json(
+      {
+        error: {
+          code: "PROFILE_NOT_FOUND",
+          message: "Profile not found.",
+        },
+      },
+      { status: 404 }
+    );
+
+  }
+
+
+  // 3. Send profile to client
+  return NextResponse.json(
+    {
+      user: {
+        id: profile.id,
+        npc_name: profile.npc_name,
+        avatar: profile.avatar,
+        hasProfile: true,
+      },
+    },
+    {
+      status: 200,
+    }
+  );
 }

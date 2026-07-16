@@ -5,47 +5,33 @@
 
 "use client";
 
+// hooks/useAuthCheck.ts
+"use client";
+
 import { createClient } from "@/lib/supabase/client";
+import { useUserStore } from "@/components/stores/userStore";
 import { useMemo } from "react";
 
 export type AuthState =
-  | { loggedIn: false; hasProfile: false }
-  | { loggedIn: true; hasProfile: false }
-  | { loggedIn: true; hasProfile: true };
+  | { loggedIn: false;  hasProfile: false }
+  | { loggedIn: true;   hasProfile: false }
+  | { loggedIn: true;   hasProfile: true  };
 
 export function useAuthCheck() {
-   const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => createClient(), []);
+  const user     = useUserStore((state) => state.user);
 
   const check = async (): Promise<AuthState> => {
-    // Get current session
-    const response = await supabase.auth.getSession();
-    let session = response.data.session;
+    // reads from browser cookie — zero network, zero DB
+    const { data: { session } } = await supabase.auth.getSession();
 
-    // No session = user is not logged in
     if (!session) {
-      return {
-        loggedIn: false,
-        hasProfile: false,
-      };
+      return { loggedIn: false, hasProfile: false };
     }
+    const hasProfile = !!user;
 
-    // Refresh session to get latest metadata
-    const refreshResponse = await supabase.auth.refreshSession();
-    const refreshedSession = refreshResponse.data.session;
-
-    if (refreshedSession) {
-      session = refreshedSession;
-    }
-
-    // Check profile completion from Supabase user metadata
-    const hasProfile =
-      session.user.user_metadata?.profile_complete === true;
-
-    return {
-      loggedIn: true,
-      hasProfile,
-    };
+    return { loggedIn: true, hasProfile };
   };
 
   return { check };
-} 
+}
