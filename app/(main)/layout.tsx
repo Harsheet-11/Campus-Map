@@ -6,8 +6,8 @@ export default function MainLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen bg-[#F8EFD9]">
+    <main className="fixed inset-0 overflow-hidden">
       {children}
-    </div>
+    </main>
   );
 }
