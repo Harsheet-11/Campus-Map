@@ -13,24 +13,26 @@ import {
   MAX_ZOOM,
 } from "@/lib/campusBounds";
 
-import { useMapStore }       from "@/components/stores/mapStore";
-import BoundsEnforcer        from "@/components/map/BoundsEnforcer";
-import CinematicSequence     from "@/components/map/CinematicSequence";
-import ModeToggle            from "@/components/map/ModeToggle";
-import LoreModeOverlay       from "@/components/map/LoreModeOverlay";
-import LoreTicker            from "@/components/map/LoreTicker";
+import { useMapStore } from "@/components/stores/mapStore";
+// import BoundsEnforcer        from "@/components/map/BoundsEnforcer";
+import MapFitter from "@/components/map/MapFitter";
+import CinematicSequence from "@/components/map/CinematicSequence";
+import ModeToggle from "@/components/map/ModeToggle";
+import LoreModeOverlay from "@/components/map/LoreModeOverlay";
 
-delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
+  ._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl:       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl:     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
 const CINEMATIC_KEY = "nitr-cinematic-done";
 
 export default function MapShell() {
-  const [mounted,       setMounted]       = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [showCinematic, setShowCinematic] = useState(false);
   const mode = useMapStore((s) => s.mode);
 
@@ -48,14 +50,14 @@ export default function MapShell() {
 
   const maxBounds = L.latLngBounds(
     [CAMPUS_BOUNDS.SW.lat, CAMPUS_BOUNDS.SW.lng],
-    [CAMPUS_BOUNDS.NE.lat, CAMPUS_BOUNDS.NE.lng]
+    [CAMPUS_BOUNDS.NE.lat, CAMPUS_BOUNDS.NE.lng],
   );
 
   return (
     <div
       className="relative w-full h-screen overflow-hidden isolate"
       style={{
-        filter:     mode === "lore" ? "saturate(0.3) brightness(0.7)" : "none",
+        filter: mode === "lore" ? "saturate(0.3) brightness(0.7)" : "none",
         transition: "filter 1500ms ease",
       }}
     >
@@ -77,15 +79,13 @@ export default function MapShell() {
           errorTileUrl="/error-tile.png"
           attribution=""
         />
-        <BoundsEnforcer />
-
+        {/* <BoundsEnforcer /> */}
+        <MapFitter />
         {showCinematic && (
           <CinematicSequence onComplete={handleCinematicComplete} />
         )}
       </MapContainer>
-
       <LoreModeOverlay />
-      <LoreTicker />
       <ModeToggle />
     </div>
   );

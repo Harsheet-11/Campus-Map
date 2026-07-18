@@ -14,6 +14,6 @@ export const CAMPUS_CENTER = {
   lng: (CAMPUS_BOUNDS.SW.lng + CAMPUS_BOUNDS.NE.lng) / 2,
 } as const;
 
-export const DEFAULT_ZOOM = 15;
-export const MIN_ZOOM     = 15;
+export const DEFAULT_ZOOM = 16;
+export const MIN_ZOOM     = 16;
 export const MAX_ZOOM     = 17;
