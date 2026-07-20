@@ -1,4 +1,3 @@
-// components/stores/mapStore.ts
 import { create } from "zustand";
 
 export type MapMode   = "general" | "lore" | "fest";
