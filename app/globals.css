@@ -25,49 +25,6 @@
   }
 }
 
-@keyframes lore-grain {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  10% {
-    transform: translate(-2%, -3%);
-  }
-
-  20% {
-    transform: translate(3%, 1%);
-  }
-
-  30% {
-    transform: translate(-1%, 4%);
-  }
-
-  40% {
-    transform: translate(2%, -2%);
-  }
-
-  50% {
-    transform: translate(-3%, 2%);
-  }
-
-  60% {
-    transform: translate(1%, -4%);
-  }
-
-  70% {
-    transform: translate(-2%, 3%);
-  }
-
-  80% {
-    transform: translate(3%, -1%);
-  }
-
-  90% {
-    transform: translate(-1%, -2%);
-  }
-}
 
 @keyframes ticker {
   0% {
@@ -107,235 +64,738 @@
   border: none;
 }
 
+/* ─── Lore spooky atmosphere ───────────────────────── */
 
-/* ─── Spot icons (shared base) ───────────────────────────────────────────── */
+.leaflet-tile-pane.lore-spooky {
 
-.spot-icon-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
+  animation:
+    lore-breathe 10s ease-in-out infinite;
+
 }
 
-.spot-emoji {
+
+/* slow haunted breathing */
+
+@keyframes lore-breathe {
+
+  0%,
+  100% {
+
+    filter:
+      saturate(0.35)
+      brightness(0.62)
+      contrast(1.15);
+
+  }
+
+
+  50% {
+
+    filter:
+      saturate(0.45)
+      brightness(0.72)
+      contrast(1.05);
+
+  }
+
+}
+
+/* ===============================
+   LORE FOG
+================================ */
+
+.lore-fog {
+
+  position:absolute;
+
+  inset:-20%;
+
+  pointer-events:none;
+
+  opacity:0.18;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(220,220,255,0.25),
+      transparent 60%
+    );
+
+  filter:blur(40px);
+
+}
+
+
+.lore-fog-1 {
+
+  animation:
+    fog-move-1 25s linear infinite;
+
+}
+
+
+.lore-fog-2 {
+
+  opacity:0.12;
+
+  animation:
+    fog-move-2 35s linear infinite;
+
+}
+
+
+
+
+@keyframes fog-move-1 {
+
+  0% {
+
+    transform:
+      translateX(-10%)
+      translateY(0);
+
+  }
+
+
+  50% {
+
+    transform:
+      translateX(10%)
+      translateY(-5%);
+
+  }
+
+
+  100% {
+
+    transform:
+      translateX(-10%)
+      translateY(0);
+
+  }
+
+}
+
+
+
+
+@keyframes fog-move-2 {
+
+  0% {
+
+    transform:
+      translateX(10%)
+      translateY(5%);
+
+  }
+
+
+  50% {
+
+    transform:
+      translateX(-10%)
+      translateY(-5%);
+
+  }
+
+
+  100% {
+
+    transform:
+      translateX(10%)
+      translateY(5%);
+
+  }
+
+}
+
+
+
+/* ===============================
+   FLOATING GHOSTS
+================================ */
+
+
+.ghost {
+
+  position:absolute;
+
+  font-size:40px;
+
+  opacity:0.18;
+
+  filter:
+    blur(0.3px)
+    drop-shadow(
+      0 0 15px rgba(255,255,255,0.5)
+    );
+
+
+}
+
+
+
+.ghost-1 {
+
+  left:20%;
+
+  bottom:-50px;
+
+  animation:
+    ghost-float-1 18s linear infinite;
+
+}
+
+
+
+.ghost-2 {
+
+  left:55%;
+
+  bottom:-80px;
+
+  font-size:30px;
+
+  animation:
+    ghost-float-2 25s linear infinite;
+
+}
+
+
+
+.ghost-3 {
+
+  left:80%;
+
+  bottom:-100px;
+
+  font-size:45px;
+
+  animation:
+    ghost-float-3 30s linear infinite;
+
+}
+
+
+
+
+
+@keyframes ghost-float-1 {
+
+  0% {
+
+    transform:
+      translateY(0)
+      translateX(0)
+      rotate(0deg);
+
+    opacity:0;
+
+  }
+
+
+  20% {
+
+    opacity:.18;
+
+  }
+
+
+  100% {
+
+    transform:
+      translateY(-120vh)
+      translateX(60px)
+      rotate(15deg);
+
+    opacity:0;
+
+  }
+
+}
+
+
+
+
+@keyframes ghost-float-2 {
+
+  0% {
+
+    transform:
+      translateY(0)
+      translateX(0);
+
+    opacity:0;
+
+  }
+
+
+  30% {
+
+    opacity:.15;
+
+  }
+
+
+  100% {
+
+    transform:
+      translateY(-120vh)
+      translateX(-80px);
+
+    opacity:0;
+
+  }
+
+}
+
+
+
+
+@keyframes ghost-float-3 {
+
+  0% {
+
+    transform:
+      translateY(0);
+
+    opacity:0;
+
+  }
+
+
+  25% {
+
+    opacity:.2;
+
+  }
+
+
+  100% {
+
+    transform:
+      translateY(-120vh)
+      translateX(-40px);
+
+    opacity:0;
+
+  }
+
+}
+/* ─── Spot Marker Base ───────────────────────────────────────────── */
+
+.spot-marker {
+
+  width:60px;
+  height:60px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+
+  font-size:30px;
+
+  line-height:1;
+
+
+  cursor:pointer;
+  user-select:none;
+
+
+  filter:
+    drop-shadow(
+      0 2px 4px rgba(0,0,0,0.35)
+    );
+
+}
+
+
+/* ─── Emoji Marker ───────────────────────────────────────────── */
+
+.spot-marker-emoji {
+
+  font-size: 32px;
+
   line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+
+  filter:
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+
 }
 
-/* ─── Animation variants ─────────────────────────────────────────────────── */
-/* Adding a new category = add one new class here.                            */
+
+
+/* ─── Appearance Animation ───────────────────────────────────── */
+/*
+ Only applied when React creates a new marker.
+ Existing markers do not move.
+*/
+
+@keyframes spot-appear {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      scale(0.85);
+
+  }
+
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      scale(1);
+
+  }
+
+}
+
+
+
+/* ─── Label Only Marker ─────────────────────────────────────── */
+
+
+.spot-label-marker {
+
+  color: white;
+
+  font-family:
+    "Arial Rounded MT Bold",
+    "Helvetica Rounded",
+    "Arial Black",
+    sans-serif;
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  /* More space between lines */
+  line-height: 1.35;
+
+  letter-spacing: -0.4px;
+
+  white-space: normal;
+
+  max-width: 140px;
+
+  text-align: center;
+
+  word-wrap: break-word;
+
+  /* Extra breathing room */
+  padding: 4px 8px;
+
+  -webkit-text-stroke:
+    3px #111827;
+
+  paint-order:
+    stroke fill;
+
+  filter:
+    drop-shadow(0 3px 2px rgba(0, 0, 0, 0.35));
+
+  transform:
+    rotate(-2deg);
+}
+
+
+
+/* ─── BOTH type marker ───────────────────────────────────────── */
+
+
+.spot-both {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+}
+
+
+
+.spot-both .spot-marker-emoji {
+
+  font-size: 32px;
+
+  line-height: 1;
+
+}
+
+
+
+.spot-both .spot-label-marker {
+
+  margin-top: 5px;
+
+}
+
+
+
+/* ─── Category Animations ───────────────────────────────────── */
+
 
 .spot-emoji--steam {
-  animation: spot-steam 2.5s ease-in-out infinite;
+
+  animation:
+    spot-steam 2.5s ease-in-out infinite;
+
 }
+
+
 
 .spot-emoji--bob {
-  animation: spot-bob 3s ease-in-out infinite;
+
+  animation:
+    spot-bob 3s ease-in-out infinite;
+
 }
+
+
 
 .spot-emoji--pulse {
-  animation: spot-pulse 2s ease-in-out infinite;
+
+  animation:
+    spot-pulse 2s ease-in-out infinite;
+
 }
 
+
+
 .spot-emoji--none {
-  /* No animation — static marker. */
+
+  animation: none;
+
 }
+
+
 
 @keyframes spot-steam {
 
   0%,
   100% {
-    transform: translateY(0px) scale(1);
+
+    transform:
+      translateY(0) scale(1);
+
   }
 
+
   50% {
-    transform: translateY(-3px) scale(1.05);
+
+    transform:
+      translateY(-3px) scale(1.05);
+
   }
+
 }
+
+
 
 @keyframes spot-bob {
 
   0%,
   100% {
-    transform: translateY(0px);
+
+    transform:
+      translateY(0);
+
   }
 
+
   50% {
-    transform: translateY(-4px);
+
+    transform:
+      translateY(-4px);
+
   }
+
 }
+
+
 
 @keyframes spot-pulse {
 
   0%,
   100% {
-    transform: scale(1);
+
+    transform:
+      scale(1);
+
   }
+
 
   50% {
-    transform: scale(1.12);
+
+    transform:
+      scale(1.1);
+
   }
+
 }
 
-/* ─── Label (canteen and future label-showing categories) ────────────────── */
 
-.spot-label {
-  margin-top: 3px;
-  font-size: 11px;
-  font-weight: 800;
-  color: #1f2937;
-  background: rgba(255, 252, 245, 0.92);
-  border: 1.5px solid #1f2937;
-  border-radius: 6px;
-  padding: 1px 5px;
-  white-space: nowrap;
+
+/* ─── Popup ───────────────────────────────────────────── */
+/* Leaflet popup reset */
+.leaflet-popup.spot-popup {
+  margin-bottom: 0;
+}
+
+.leaflet-popup.spot-popup .leaflet-popup-content-wrapper {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup.spot-popup .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.leaflet-popup.spot-popup .leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.leaflet-popup.spot-popup .leaflet-popup-tip {
+  display: none !important;
+}
+
+.spot-card {
+  position: relative;
+  width: 190px;
+
+  background:
+    linear-gradient(145deg, #fffdf7, #fff5dc);
+
+  border: 2px solid #222;
+  border-radius: 22px;
+
+  padding: 14px 12px 12px;
+
   text-align: center;
-  letter-spacing: 0.01em;
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ─── Spot popup (chai and future popup-type categories) ─────────────────── */
-
-.spot-popup .leaflet-popup-content-wrapper {
-  background: #fffcf5;
-  border: 2px solid #1f2937;
-  border-radius: 12px;
-  box-shadow: 3px 3px 0 #1f2937;
-  padding: 0;
-}
-
-.spot-popup .leaflet-popup-content {
-  margin: 10px 12px;
-}
-
-.spot-popup .leaflet-popup-tip-container {
-  display: none;
-}
-
-.spot-icon-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.spot-emoji {
-  line-height: 1;
-
-  filter:
-    drop-shadow(0 2px 4px rgba(0, 0, 0, .3));
-}
-
-.spot-label {
-
-  margin-top: 3px;
-
-  background: #FFFCF5;
-
-  border: 2px solid #1F2937;
-
-  border-radius: 6px;
-
-  padding: 2px 6px;
-
-  font-size: 11px;
-
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.spot-emoji--steam {
-  animation: steam 2.5s ease-in-out infinite;
-}
-
-.spot-emoji--bob {
-  animation: bob 3s ease-in-out infinite;
-}
-
-.spot-emoji--pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.spot-emoji--none {}
-
-@keyframes steam {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-3px) scale(1.05);
-  }
-
-}
-
-@keyframes bob {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-4px);
-  }
-
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-
-}
-
-/* ─── Spot Popup ───────────────────────────────────────────── */
-
-.spot-popup .leaflet-popup-content-wrapper {
-
-  background: #fffcf5;
-
-  border: 2px solid #1f2937;
-
-  border-radius: 12px;
 
   box-shadow:
-    3px 3px 0 #1f2937;
+    5px 5px 0 #222,
+    0 10px 20px rgba(0,0,0,.18);
 
-  padding: 0;
+  overflow: hidden;
 
+  animation: popup .25s cubic-bezier(.2,1.5,.5,1);
+}
+
+/* tiny decorative corner */
+.spot-card::before {
+  content: "✨";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 12px;
+  opacity: .7;
 }
 
 
-.spot-popup .leaflet-popup-content {
+/* icon bubble */
+.spot-card-icon {
+  width: 34px;
+  height: 34px;
 
-  margin: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  margin: 0 auto 8px;
+
+  background: #ffcfdf;
+  border: 2px solid #222;
+  border-radius: 50%;
+
+  font-size: 1.1rem;
+
+  box-shadow: 2px 2px 0 #222;
 }
 
 
-.spot-popup .leaflet-popup-tip {
-
-  display: none;
-
+/* header */
+.spot-card-header {
+  display: block;
+  margin-bottom: 10px;
 }
 
 
-/* Remove Leaflet default close button */
+.spot-card h3 {
+  margin: 0 auto;
 
-.spot-popup .leaflet-popup-close-button {
+  max-width: 160px;
 
-  display: none;
+  font-family: "Trebuchet MS", sans-serif;
 
+  font-size: 1rem;
+  line-height: 1.15;
+
+  font-weight: 900;
+
+  color: #292929;
+
+  letter-spacing: -.03em;
+
+  text-transform: capitalize;
+}
+
+
+/* description */
+.spot-card p {
+  margin: 10px 0 0;
+  padding-top: 10px;
+
+  border-top: 2px dashed #ddd;
+
+  font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+
+  font-size: .82rem;
+  line-height: 1.35;
+
+  color: #666;
+
+  font-style: italic;
+}
+
+
+/* little speech bubble pointer */
+.spot-card-arrow {
+  position:absolute;
+
+  bottom:-9px;
+  left:35px;
+
+  width:16px;
+  height:16px;
+
+  background:#fff8e8;
+
+  border-right:2px solid #222;
+  border-bottom:2px solid #222;
+
+  transform:rotate(45deg);
+}
+
+
+@keyframes popup {
+  from {
+    transform: scale(.8) translateY(10px);
+    opacity:0;
+  }
+
+  to {
+    transform: scale(1) translateY(0);
+    opacity:1;
+  }
 }

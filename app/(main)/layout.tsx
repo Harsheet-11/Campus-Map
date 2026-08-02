@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import QueryProvider from "@/components/providers/QueryProvider";
 
 export default function MainLayout({
   children,
@@ -7,7 +8,9 @@ export default function MainLayout({
 }) {
   return (
     <main className="fixed inset-0 overflow-hidden">
+      <QueryProvider>
       {children}
+      </QueryProvider>
     </main>
   );
 }

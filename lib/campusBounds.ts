@@ -16,4 +16,4 @@ export const CAMPUS_CENTER = {
 
 export const DEFAULT_ZOOM = 16;
 export const MIN_ZOOM     = 16;
-export const MAX_ZOOM     = 17;
+export const MAX_ZOOM     = 18;

@@ -1,73 +1,63 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 300;
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const category = searchParams.get("category");
-
+export async function GET() {
   const supabase = await createClient();
 
-  let query = supabase
+  const { data, error } = await supabase
     .from("permanent_spots")
     .select(
       `
-      id,
-      name,
-      category,
-      lat,
-      lng,
-      description,
-      min_zoom,
-      icons!inner (
-        emoji,
-        slug,
-        color
-      )
-    `,
+        id,
+        name,
+        slang,
+        category,
+        lat,
+        lng,
+        min_zoom,
+        description,
+        display_type,
+        click_action,
+        icons!permanent_spots_icon_id_fkey(
+          emoji,
+          slug,
+          color,
+          is_active
+        )
+      `,
     )
     .eq("approved", true)
-    .eq("is_hidden", false);
-
-  if (category) {
-    query = query.eq("category", category);
-  }
-
-  const { data, error } = await query;
+    .eq("is_hidden", false)
+    .eq("icons.is_active", true);
 
   if (error) {
     return NextResponse.json(
-      { error: { code: "DB_ERROR", message: "Could not load spots." } },
-      { status: 500, headers: { "Cache-Control": "no-store" } },
+      {
+        error: "Could not load spots",
+      },
+      {
+        status: 500,
+      },
     );
   }
 
-  const spots = (data ?? []).map((row) => {
-    const icon = Array.isArray(row.icons) ? row.icons[0] : row.icons;
-    const showLabel = row.category !== "CHAI";
+  const spots = (data ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    slang: row.slang,
+    category: row.category,
+    lat: Number(row.lat),
+    lng: Number(row.lng),
+    min_zoom: Number(row.min_zoom),
+    description: row.description,
+    display_type: row.display_type,
+    click_action: row.click_action,
+    icon: Array.isArray(row.icons)
+      ? (row.icons[0] ?? null)
+      : (row.icons ?? null),
+  }));
 
-    return {
-      id: row.id,
-      name: row.name,
-      category: row.category,
-      lat: Number(row.lat),
-      lng: Number(row.lng),
-      description: row.description,
-      min_zoom: row.min_zoom,
-      icon: {
-        emoji: icon.emoji,
-        slug: icon.slug,
-        color: icon.color,
-        show_name_label: showLabel,
-        name_label_min_zoom: showLabel ? (row.min_zoom ?? null) : null,
-      },
-    };
+  return NextResponse.json({
+    spots,
   });
-
-  return NextResponse.json(
-    { spots },
-    { headers: { "Cache-Control": "s-maxage=300, stale-while-revalidate=60" } },
-  );
 }

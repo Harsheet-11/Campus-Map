@@ -14,13 +14,15 @@ import {
 } from "@/lib/campusBounds";
 
 import { useMapStore } from "@/components/stores/mapStore";
-import SpotMarker from "@/components/map/SpotMarker";
-// import BoundsEnforcer        from "@/components/map/BoundsEnforcer";
 import MapFitter from "@/components/map/MapFitter";
 import CinematicSequence from "@/components/map/CinematicSequence";
 import ModeToggle from "@/components/map/ModeToggle";
 import LoreModeOverlay from "@/components/map/LoreModeOverlay";
-import { useSpots } from "@/hooks/useSpots";
+import MapZoomTracker from "@/components/spots/MapZoomTracker";
+import SpotManager from "@/components/spots/SpotManager";
+import BottomSheet from "@/components/cards/BottomSheet";
+import CompForm from "@/components/cards/CompForm";
+import { useSpotStore } from "@/components/stores/spotStore";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
   ._getIconUrl;
@@ -36,8 +38,12 @@ const CINEMATIC_KEY = "nitr-cinematic-done";
 export default function MapShell() {
   const [mounted, setMounted] = useState(false);
   const [showCinematic, setShowCinematic] = useState(false);
+  // Zustand hooks must be here
   const mode = useMapStore((s) => s.mode);
-  const { spots } = useSpots();
+
+  const action = useSpotStore((state) => state.action);
+
+  const selectedSpot = useSpotStore((state) => state.selectedSpot);
 
   useEffect(() => {
     const done = localStorage.getItem(CINEMATIC_KEY) === "true";
@@ -58,41 +64,42 @@ export default function MapShell() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden isolate">
-      <div
-        className="absolute inset-0"
-        style={{
-        filter: mode === "lore" ? "saturate(0.3) brightness(0.7)" : "none",
-        transition: "filter 1500ms ease",
-      }}
-    >
-      <MapContainer
-        center={[CAMPUS_CENTER.lat, CAMPUS_CENTER.lng]}
-        zoom={showCinematic ? MIN_ZOOM : DEFAULT_ZOOM}
-        minZoom={MIN_ZOOM}
-        maxZoom={MAX_ZOOM}
-        maxBounds={maxBounds}
-        maxBoundsViscosity={1.0}
-        zoomControl={true}
-        attributionControl={false}
-        style={{ width: "100%", height: "100%" }}
-      >
-        <TileLayer
-          url="/tiles/{z}/{x}/{y}.png"
+      <div className="absolute inset-0">
+        <MapContainer
+          center={[CAMPUS_CENTER.lat, CAMPUS_CENTER.lng]}
+          zoom={showCinematic ? MIN_ZOOM : DEFAULT_ZOOM}
           minZoom={MIN_ZOOM}
           maxZoom={MAX_ZOOM}
-          errorTileUrl="/error-tile.png"
-          attribution=""
-        />
-        {spots.map((spot) => (
-  <SpotMarker key={spot.id} spot={spot} />
-))}
-        {/* <BoundsEnforcer /> */}
-        <MapFitter />
-        {showCinematic && (
-          <CinematicSequence onComplete={handleCinematicComplete} />
+          maxBounds={maxBounds}
+          maxBoundsViscosity={1.0}
+          zoomControl={true}
+          attributionControl={false}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <TileLayer
+            url="/tiles/{z}/{x}/{y}.png"
+            minZoom={MIN_ZOOM}
+            maxZoom={MAX_ZOOM}
+            errorTileUrl="/error-tile.png"
+            attribution=""
+            className={mode === "lore" ? "lore-tiles" : ""}
+          />
+          <LoreModeOverlay />
+          <MapZoomTracker />
+          <SpotManager />
+          <MapFitter />
+          {showCinematic && (
+            <CinematicSequence onComplete={handleCinematicComplete} />
+          )}
+        </MapContainer>
+
+        {action === "BOTTOM_SHEET" && selectedSpot && (
+          <BottomSheet spot={selectedSpot} />
         )}
-      </MapContainer>
-      <LoreModeOverlay />
+
+        {action === "COMP_FORM" && selectedSpot && (
+          <CompForm spot={selectedSpot} />
+        )}
       </div>
       <ModeToggle />
     </div>
