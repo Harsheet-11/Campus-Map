@@ -20,9 +20,7 @@ import ModeToggle from "@/components/map/ModeToggle";
 import LoreModeOverlay from "@/components/map/LoreModeOverlay";
 import MapZoomTracker from "@/components/spots/MapZoomTracker";
 import SpotManager from "@/components/spots/SpotManager";
-import BottomSheet from "@/components/cards/BottomSheet";
-import CompForm from "@/components/cards/CompForm";
-import { useSpotStore } from "@/components/stores/spotStore";
+import CardDialog from "../bgDialog/CardDialog";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
   ._getIconUrl;
@@ -40,10 +38,6 @@ export default function MapShell() {
   const [showCinematic, setShowCinematic] = useState(false);
   // Zustand hooks must be here
   const mode = useMapStore((s) => s.mode);
-
-  const action = useSpotStore((state) => state.action);
-
-  const selectedSpot = useSpotStore((state) => state.selectedSpot);
 
   useEffect(() => {
     const done = localStorage.getItem(CINEMATIC_KEY) === "true";
@@ -92,16 +86,9 @@ export default function MapShell() {
             <CinematicSequence onComplete={handleCinematicComplete} />
           )}
         </MapContainer>
-
-        {action === "BOTTOM_SHEET" && selectedSpot && (
-          <BottomSheet spot={selectedSpot} />
-        )}
-
-        {action === "COMP_FORM" && selectedSpot && (
-          <CompForm spot={selectedSpot} />
-        )}
       </div>
       <ModeToggle />
+      <CardDialog/>
     </div>
   );
 }

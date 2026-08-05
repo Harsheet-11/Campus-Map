@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { PermanentSpot } from "@/lib/types";
 
-type SpotAction = "POPUP" | "BOTTOM_SHEET" | "COMP_FORM" | "NONE" | null;
+type SpotAction = "POPUP" | "MENU_CARD" | "COMP_FORM" | "NONE" | null;
 
 type SpotStore = {
   selectedSpot: PermanentSpot | null;

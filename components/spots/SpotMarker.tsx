@@ -22,8 +22,8 @@ export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
     selectSpot(spot);
 
     switch (spot.click_action) {
-      case "BOTTOM_SHEET":
-        openAction("BOTTOM_SHEET");
+      case "MENU_CARD":
+        openAction("MENU_CARD");
         break;
 
       case "COMP_FORM":
