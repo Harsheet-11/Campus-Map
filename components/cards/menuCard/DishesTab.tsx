@@ -1,104 +1,149 @@
 "use client";
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowUp01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
+import type { Dish } from "@/hooks/useCanteenFood";
 
-type Dish = {
-  id: string;
-  dish_name: string;
-  review: string;
-  upvotes: number;
-  downvotes: number;
+type DishesTabProps = {
+  sortedDishes: Dish[];
+  isLoading: boolean;
+  error: Error | null;
 };
 
 export default function DishesTab({
   sortedDishes,
-  userVotes,
-  getVoteCount,
-  handleVote,
-}: {
-  sortedDishes: Dish[];
-  userVotes: Record<string, boolean>;
-  getVoteCount: (dish: Dish) => number;
-  handleVote: (dishId: string) => void;
-}) {
+  isLoading,
+  error,
+}: DishesTabProps) {
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center gap-3">
+        {/* Animated pulsing plates */}
+        <div className="flex gap-2">
+          <div className="w-8 h-8 rounded-full bg-amber-100 animate-pulse" />
+          <div className="w-8 h-8 rounded-full bg-amber-200 animate-pulse delay-150" />
+          <div className="w-8 h-8 rounded-full bg-amber-100 animate-pulse delay-300" />
+        </div>
+        <p
+          className="text-[13px] font-bold text-gray-400"
+          style={{ letterSpacing: "-0.005em" }}
+        >
+          Loading dishes...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center gap-2 px-6">
+        <div className="text-[28px]">😕</div>
+        <p
+          className="text-[13.5px] font-extrabold text-gray-900 text-center"
+          style={{ letterSpacing: "-0.01em" }}
+        >
+          Something went wrong
+        </p>
+        <p
+          className="text-[12px] font-medium text-gray-400 text-center"
+          style={{ letterSpacing: "-0.003em" }}
+        >
+          Could not load dishes. Try again later.
+        </p>
+      </div>
+    );
+  }
+
+  if (sortedDishes.length === 0) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center gap-2 px-6">
+        <div className="text-[28px]">🍽️</div>
+        <p
+          className="text-[13.5px] font-extrabold text-gray-900 text-center"
+          style={{ letterSpacing: "-0.01em" }}
+        >
+          No dishes yet
+        </p>
+        <p
+          className="text-[12px] font-medium text-gray-400 text-center"
+          style={{ letterSpacing: "-0.003em" }}
+        >
+          Be the first to suggest a dish!
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 min-h-0 font-sans">
-      {/* Scrollable dishes list */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-2.5 pr-1 -mr-1">
-        {sortedDishes.map((dish, index) => {
-          const voted = userVotes[dish.id];
-          const count = getVoteCount(dish);
+    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-2 pr-0.5">
+      {sortedDishes.map((dish, index) => {
+        // Top 3 dishes get a medal
+        const medal =
+          index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : null;
 
-          return (
+        // Top dish gets a highlighted card
+        const isTop = index === 0;
+
+        return (
+          <div
+            key={dish.id}
+            className={`relative flex items-start gap-3 rounded-2xl px-3.5 py-3 transition-all ${
+              isTop
+                ? "bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200/80 shadow-sm"
+                : "bg-gray-50 border border-gray-100 hover:border-gray-200"
+            }`}
+          >
+            {/* Rank badge */}
             <div
-              key={dish.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_6px_-2px_rgba(0,0,0,0.06)] p-3 flex items-center gap-3"
+              className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl text-[13px] font-extrabold ${
+                medal
+                  ? isTop
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-gray-100 text-gray-500"
+                  : "bg-gray-100 text-gray-400"
+              }`}
             >
-              {/* Rank number thumbnail */}
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-amber-50 flex items-center justify-center">
-                <span
-                  className="text-[22px] font-extrabold text-amber-700"
-                  style={{ letterSpacing: "-0.02em" }}
-                >
-                  #{index + 1}
-                </span>
-              </div>
+              {medal ?? index + 1}
+            </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h3
-                  className="font-extrabold text-[15px] text-gray-900 leading-tight"
+            {/* Dish info */}
+            <div className="flex-1 min-w-0 pt-0.5">
+              <div className="flex items-center gap-1.5">
+                <p
+                  className={`text-[13.5px] font-extrabold leading-snug truncate ${
+                    isTop ? "text-amber-900" : "text-gray-900"
+                  }`}
                   style={{ letterSpacing: "-0.01em" }}
                 >
                   {dish.dish_name}
-                </h3>
-                <p
-                  className="text-[12px] text-gray-500 mt-0.5 leading-snug font-medium line-clamp-2"
-                  style={{ letterSpacing: "-0.003em" }}
-                >
-                  {dish.review}
                 </p>
+                {isTop && (
+                  <span className="flex-shrink-0 text-[9px] font-extrabold uppercase tracking-wide text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full">
+                    Popular
+                  </span>
+                )}
               </div>
 
-              {/* Vote button */}
-              <button
-                onClick={() => handleVote(dish.id)}
-                className={`flex-shrink-0 flex flex-col items-center justify-center w-11 h-13 rounded-xl px-2 py-1.5 transition-all ${
-                  voted
-                    ? "bg-[#FFCC33] text-gray-900 shadow-md"
-                    : "bg-[#FFF3C4] text-gray-800 hover:bg-[#FFE894]"
-                }`}
-                aria-label="Upvote"
+              <p
+                className="text-[11.5px] text-gray-500 font-medium mt-0.5 line-clamp-2 leading-snug"
+                style={{ letterSpacing: "-0.003em" }}
               >
-                <HugeiconsIcon
-                  icon={ArrowUp01Icon}
-                  size={14}
-                  strokeWidth={3}
-                />
-                <span className="font-extrabold text-[13px] mt-0.5 tabular-nums leading-none">
-                  {count}
+                {dish.review}
+              </p>
+
+              {/* Upvote count as a subtle badge */}
+              <div className="flex items-center gap-1 mt-1.5">
+                <span className="text-[11px]">👍</span>
+                <span
+                  className={`text-[11px] font-bold ${
+                    isTop ? "text-amber-700" : "text-gray-400"
+                  }`}
+                >
+                  {dish.upvotes}
                 </span>
-              </button>
+              </div>
             </div>
-          );
-        })}
-
-        {sortedDishes.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-sm font-bold text-gray-800">No dishes yet</p>
-            <p className="text-xs text-gray-500 mt-1 font-medium">
-              Be the first to suggest one!
-            </p>
           </div>
-        )}
-      </div>
-
-      {/* Fixed footer note */}
-      <div className="flex-shrink-0 pt-3 pb-1 flex items-center justify-center gap-1.5 text-[11px] text-gray-400 font-semibold border-t border-gray-50 mt-2">
-        <HugeiconsIcon icon={SparklesIcon} size={11} />
-        <span>Voting helps us know what you love!</span>
-      </div>
+        );
+      })}
     </div>
   );
 }

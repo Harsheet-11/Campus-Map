@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { Input } from "@/components/ui/input";
 import { useUserStore } from "@/components/stores/userStore";
+import { useModalStore } from "@/components/stores/modalStore";
 
 async function sha256(text: string): Promise<string> {
   // crypto.subtle is only available on HTTPS / localhost (secure contexts)
@@ -102,6 +103,8 @@ interface NicknameCardProps {
 export default function NicknameCard({ onDismiss }: NicknameCardProps) {
   const router = useRouter();
 
+  const closeModal = useModalStore((state) => state.close);
+
   const [avatar, setAvatar] = useState("😎");
   const [rollNumber, setRollNumber] = useState("");
   const [nickname, setNickname] = useState("");
@@ -136,7 +139,19 @@ export default function NicknameCard({ onDismiss }: NicknameCardProps) {
       return data;
     },
     onSuccess() {
+      closeModal();
+
+      // optional refresh server components
       router.refresh();
+
+      // toast
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: {
+            message: "Welcome to campus 🚀",
+          },
+        }),
+      );
     },
   });
 

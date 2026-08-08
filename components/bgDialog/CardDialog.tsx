@@ -18,10 +18,14 @@ export default function SpotDialog() {
     >
       <DialogContent
         showCloseButton={false}
-        className="p-0 border-0 bg-transparent shadow-none"
+        className="p-0 border-0 bg-transparent shadow-none max-w-[360px] w-full h-[90vh] max-h-[640px]"
       >
         {selectedSpot && (
-          <MenuCard spot={selectedSpot} onClose={clearSpot} />
+          <MenuCard
+            key={selectedSpot.id}
+            spot={selectedSpot}
+            onClose={clearSpot}
+          />
         )}
       </DialogContent>
     </Dialog>

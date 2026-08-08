@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useModalStore } from "@/components/stores/modalStore";
-import NicknameCard from "@/components/auth/NicknameCard";
+import NicknameCard from "@/components/cards/NicknameCard";
 import ProfileIcon from "@/components/profile/ProfileIcon";
 
 // ── Per-modal dialog shell config ──────────────────────────────

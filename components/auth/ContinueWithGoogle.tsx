@@ -16,6 +16,10 @@ export default function ContinueWithGoogle() {
 
   async function login() {
     sessionStorage.setItem("show-welcome-toast", "1");
+    console.log(
+      "REDIRECT SENT TO SUPABASE:",
+      `${window.location.origin}/api/auth/callback`,
+    );
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
