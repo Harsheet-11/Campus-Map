@@ -7,7 +7,6 @@ export type Dish = {
   dish_name: string;
   review: string;
   upvotes: number;
-  downvotes: number;
   score: number;
 };
 
