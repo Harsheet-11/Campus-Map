@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useCanteenFood } from "@/hooks/useCanteenFood";
 
 export default function DishesTab({ canteenId }: { canteenId: string }) {
-  const [liked, setLiked] = useState<string[]>([]);
-  const { data: food = [], isLoading, error } = useCanteenFood(canteenId);
+
+  const { data, isLoading, error } = useCanteenFood(canteenId);
+
+  const food = data?.food_items ?? [];
+  const userVotes = data?.user_votes ?? {};
+
+  const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const [optimisticVotes, setOptimisticVotes] = useState<
+    Record<string, "UP" | null>
+  >({});
 
   if (isLoading) {
     return <p>Loading Food...</p>;
@@ -16,16 +25,72 @@ export default function DishesTab({ canteenId }: { canteenId: string }) {
   }
 
   const handleLike = (dishId: string) => {
-    setLiked((prev) =>
-      prev.includes(dishId)
-        ? prev.filter((id) => id !== dishId)
-        : [...prev, dishId],
-    );
+    const currentVote =
+      optimisticVotes[dishId] ?? (userVotes[dishId] === "UP" ? "UP" : null);
+
+    const nextVote = currentVote === "UP" ? null : "UP";
+
+    // 1. CHANGE UI IMMEDIATELY
+    setOptimisticVotes((prev) => ({
+      ...prev,
+      [dishId]: nextVote,
+    }));
+
+    // 2. Cancel previous timer
+    if (timers.current[dishId]) {
+      clearTimeout(timers.current[dishId]);
+    }
+
+    // 3. Start/restart timer
+    timers.current[dishId] = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/food/${dishId}/vote`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            vote_type: nextVote,
+          }),
+        });
+
+        if (res.status === 401) {
+          // Revert to database state
+          setOptimisticVotes((prev) => {
+            const copy = { ...prev };
+            delete copy[dishId];
+            return copy;
+          });
+
+          alert("Please log in to vote");
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error("Failed to save vote");
+        }
+
+        // IMPORTANT:
+        // Do NOT invalidate/refetch here.
+
+        // The optimistic UI is already showing the final state.
+        // Keep it until the next normal food fetch.
+      } catch (error) {
+        console.error("Vote error:", error);
+
+        // Revert if database save failed
+        setOptimisticVotes((prev) => {
+          const copy = { ...prev };
+          delete copy[dishId];
+          return copy;
+        });
+
+        alert("Could not save your vote");
+      }
+    }, 500);
   };
 
-  const rankedFood = [...food].sort(
-    (a, b) => b.upvotes - a.upvotes,
-  );
+  const rankedFood = [...food].sort((a, b) => b.upvotes - a.upvotes);
 
   return (
     <div className="flex flex-1 min-h-0 flex-col">
@@ -47,10 +112,19 @@ export default function DishesTab({ canteenId }: { canteenId: string }) {
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1">
         <div className="space-y-3">
           {rankedFood.map((dish, index) => {
-            const isLiked = liked.includes(dish.id);
+            const isLiked =
+              optimisticVotes[dish.id] !== undefined
+                ? optimisticVotes[dish.id] === "UP"
+                : userVotes[dish.id] === "UP";
 
-            // Show instant feedback when the user taps the heart.
-            const likeCount = dish.upvotes + (isLiked ? 1 : 0);
+            const likeCount =
+              dish.upvotes +
+              (optimisticVotes[dish.id] === "UP" && userVotes[dish.id] !== "UP"
+                ? 1
+                : 0) -
+              (optimisticVotes[dish.id] === null && userVotes[dish.id] === "UP"
+                ? 1
+                : 0);
 
             return (
               <div
@@ -167,17 +241,11 @@ export default function DishesTab({ canteenId }: { canteenId: string }) {
                       font-bold
                       leading-none
                       transition-colors duration-200
-                      ${
-                        isLiked
-                          ? "text-[#E85D4A]"
-                          : "text-gray-400"
-                      }
+                      ${isLiked ? "text-[#E85D4A]" : "text-gray-400"}
                     `}
                   >
                     <span>{likeCount}</span>
-                    <span>
-                      {likeCount === 1 ? "like" : "likes"}
-                    </span>
+                    <span>{likeCount === 1 ? "like" : "likes"}</span>
                   </div>
                 </div>
               </div>

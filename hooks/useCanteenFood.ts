@@ -7,14 +7,19 @@ export type Dish = {
   dish_name: string;
   review: string;
   upvotes: number;
+  downvotes: number;
   score: number;
+  canteen_id: string;
 };
 
-type CanteenFoodResponse = {
+export type CanteenFoodResponse = {
   food_items: Dish[];
+  user_votes: Record<string, "UP" | "DOWN">;
 };
 
-export async function fetchCanteenFood(canteenId: string): Promise<Dish[]> {
+export async function fetchCanteenFood(
+  canteenId: string,
+): Promise<CanteenFoodResponse> {
   const res = await fetch(`/api/canteens/${canteenId}/food`);
 
   if (!res.ok) {
@@ -22,11 +27,12 @@ export async function fetchCanteenFood(canteenId: string): Promise<Dish[]> {
   }
 
   const data: CanteenFoodResponse = await res.json();
-  return data.food_items;
+
+  return data;
 }
 
 export function useCanteenFood(canteenId: string) {
-  return useQuery<Dish[]>({
+  return useQuery<CanteenFoodResponse>({
     queryKey: ["canteen-food", canteenId],
     queryFn: () => fetchCanteenFood(canteenId),
     enabled: !!canteenId,

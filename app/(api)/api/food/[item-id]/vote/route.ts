@@ -3,95 +3,100 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ "item-id": string }> }
+  {
+    params,
+  }: {
+    params: Promise<{ "item-id": string }>;
+  },
 ) {
   const supabase = await createClient();
 
-  // Get the food item ID from the URL
-  const { "item-id": itemId } = await params;
+  const { "item-id": foodItemId } = await params;
 
-  // Get the logged-in user
+  // 1. Check login
   const {
     data: { user },
-    error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) {
+  if (!user) {
     return NextResponse.json(
-      {
-        error: "You must be logged in to vote",
-      },
-      { status: 401 }
+      { error: "Please log in to vote" },
+      { status: 401 },
     );
   }
 
-  // Get the vote from the request
+  // 2. Get requested final state
   const body = await request.json();
 
-  const { vote_type } = body;
+  const voteType = body.vote_type;
 
-  if (!vote_type) {
+  if (voteType !== "UP" && voteType !== null) {
     return NextResponse.json(
-      {
-        error: "vote_type is required",
-      },
-      { status: 400 }
+      { error: "Invalid vote_type" },
+      { status: 400 },
     );
   }
 
-  // Get the food item
+  // 3. Make sure food item exists
   const { data: foodItem, error: foodError } = await supabase
     .from("food_items")
-    .select("id, upvotes, downvotes")
-    .eq("id", itemId)
+    .select("id")
+    .eq("id", foodItemId)
     .single();
 
   if (foodError || !foodItem) {
     return NextResponse.json(
-      {
-        error: "Food item not found",
-      },
-      { status: 404 }
+      { error: "Food item not found" },
+      { status: 404 },
     );
   }
 
-  // Calculate the new vote count
-  let upvotes = foodItem.upvotes;
-  let downvotes = foodItem.downvotes;
+  // 4. User wants to remove their vote
+  if (voteType === null) {
+    const { error } = await supabase
+      .from("food_votes")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("food_item_id", foodItemId);
 
-  if (vote_type === "UP") {
-    upvotes = upvotes + 1;
+    if (error) {
+      console.error("DELETE VOTE ERROR:", error);
+
+      return NextResponse.json(
+        { error: "Could not remove vote" },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json({
+      vote_type: null,
+    });
   }
 
-  if (vote_type === "DOWN") {
-    downvotes = downvotes + 1;
-  }
-
-  // Update the food item
-  const { data, error } = await supabase
-    .from("food_items")
-    .update({
-      upvotes,
-      downvotes,
-    })
-    .eq("id", itemId)
-    .select()
-    .single();
+  // 5. User wants UP
+  const { error } = await supabase
+    .from("food_votes")
+    .upsert(
+      {
+        user_id: user.id,
+        food_item_id: foodItemId,
+        vote_type: "UP",
+      },
+      {
+        onConflict: "user_id,food_item_id",
+      },
+    );
 
   if (error) {
-    console.error("VOTE UPDATE ERROR:", error);
+    console.error("UPSERT VOTE ERROR:", error);
 
     return NextResponse.json(
-      {
-        error: "Could not update vote",
-        details: error.message,
-      },
-      { status: 500 }
+      { error: "Could not save vote" },
+      { status: 500 },
     );
   }
 
   return NextResponse.json({
-    message: "Vote recorded successfully",
-    item: data,
+    vote_type: "UP",
   });
 }

@@ -6,28 +6,55 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const supabase = await createClient();
-
   const { id: canteenId } = await params;
 
-  const { data, error } = await supabase
+  // Fetch approved food items for this canteen
+  const { data: foodItems, error: foodError } = await supabase
     .from("food_items")
-    .select("*")
-    .eq("canteen_id", canteenId);
+    .select("id, dish_name, review, upvotes, downvotes, score, canteen_id")
+    .eq("canteen_id", canteenId)
+    .eq("approved", true)
+    .order("score", { ascending: false });
 
-  if (error) {
-    console.error("SUPABASE GET ERROR:", error);
-
+  if (foodError) {
+    console.error("SUPABASE GET ERROR:", foodError);
     return NextResponse.json(
-      {
-        error: "Could not fetch food items",
-        details: error.message,
-      },
+      { error: "Could not fetch food items", details: foodError.message },
       { status: 500 },
     );
   }
 
+  // Check if user is logged in
+  // If not logged in, we still return food items but with empty votes
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // If user is logged in, fetch their votes for these specific dishes
+  let userVotes: Record<string, "UP" | "DOWN"> = {};
+
+  if (user && foodItems && foodItems.length > 0) {
+    const foodItemIds = foodItems.map((item) => item.id);
+
+    const { data: votes, error: votesError } = await supabase
+      .from("food_votes")
+      .select("food_item_id, vote_type")
+      .eq("user_id", user.id)
+      .in("food_item_id", foodItemIds);
+
+    if (!votesError && votes) {
+      // Convert array to a map for easy lookup
+      // { "dish-uuid": "UP", "dish-uuid-2": "UP" }
+      userVotes = Object.fromEntries(
+        votes.map((v) => [v.food_item_id, v.vote_type]),
+      ) as Record<string, "UP" | "DOWN">;
+    }
+  }
+
   return NextResponse.json({
-    food_items: data,
+    food_items: foodItems ?? [],
+    // user_votes tells the frontend which dishes this user has already liked
+    user_votes: userVotes,
   });
 }
 
@@ -36,10 +63,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const supabase = await createClient();
-
   const { id: canteenId } = await params;
 
-  // Get currently logged-in user
   const {
     data: { user },
     error: authError,
@@ -47,22 +72,17 @@ export async function POST(
 
   if (authError || !user) {
     return NextResponse.json(
-      {
-        error: "You must be logged in to submit a food item",
-      },
+      { error: "You must be logged in to submit a food item" },
       { status: 401 },
     );
   }
 
   const body = await request.json();
-
   const { dish_name, suggestion } = body;
 
   if (!dish_name || !suggestion) {
     return NextResponse.json(
-      {
-        error: "dish_name and suggestion are required",
-      },
+      { error: "dish_name and suggestion are required" },
       { status: 400 },
     );
   }
@@ -81,7 +101,6 @@ export async function POST(
 
   if (error) {
     console.error("SUPABASE POST ERROR:", error);
-
     return NextResponse.json(
       {
         error: error.message,
@@ -94,10 +113,7 @@ export async function POST(
   }
 
   return NextResponse.json(
-    {
-      message: "Food suggestion submitted successfully",
-      submission: data,
-    },
+    { message: "Food suggestion submitted successfully", submission: data },
     { status: 201 },
   );
 }
