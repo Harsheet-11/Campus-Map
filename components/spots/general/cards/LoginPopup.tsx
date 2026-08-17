@@ -26,7 +26,8 @@ export default function LoginPopup({ onClose }: LoginPopupProps) {
   return (
     <>
       {/* backdrop */}
-      <div className="fixed inset-0 z-50 bg-black/25 backdrop-blur-sm" />
+      <div className="fixed inset-0 z-50 bg-black/25 backdrop-blur-sm" 
+      onClick={onClose}/>
 
       {/* popup */}
       <div

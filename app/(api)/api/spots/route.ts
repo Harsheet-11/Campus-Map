@@ -18,6 +18,7 @@ export async function GET() {
         description,
         display_type,
         click_action,
+        mode,
         icons!permanent_spots_icon_id_fkey(
           emoji,
           slug,
@@ -52,6 +53,7 @@ export async function GET() {
     description: row.description,
     display_type: row.display_type,
     click_action: row.click_action,
+    mode: row.mode,
     icon: Array.isArray(row.icons)
       ? (row.icons[0] ?? null)
       : (row.icons ?? null),

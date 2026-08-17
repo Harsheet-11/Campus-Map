@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "nitr-cinematic-done";
-
 interface Props {
   onComplete: () => void;
 }
@@ -37,13 +36,9 @@ export default function CinematicSequence({ onComplete }: Props) {
       }}
     >
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-white">
-          WelCome to NITR
-        </h1>
+        <h1 className="text-3xl font-bold text-white">WelCome to NITR</h1>
 
-        <p className="mt-3 text-gray-300">
-          Enter Campus
-        </p>
+        <p className="mt-3 text-gray-300">Enter Campus</p>
       </div>
     </div>
   );

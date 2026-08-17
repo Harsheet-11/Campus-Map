@@ -17,10 +17,12 @@ import { useMapStore } from "@/components/stores/mapStore";
 import MapFitter from "@/components/map/MapFitter";
 import CinematicSequence from "@/components/map/CinematicSequence";
 import ModeToggle from "@/components/map/ModeToggle";
-import LoreModeOverlay from "@/components/map/LoreModeOverlay";
 import MapZoomTracker from "@/components/spots/MapZoomTracker";
 import SpotManager from "@/components/spots/SpotManager";
-import CardDialog from "../bgDialog/CardDialog";
+import CardDialog from "../bgDialog/SpotDialog";
+
+import LoreModeOverlay from "@/components/spots/lore/LoreModeOverlay";
+import LoreLayer from "../spots/lore/LoreLayer";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
   ._getIconUrl;
@@ -81,6 +83,7 @@ export default function MapShell() {
           <LoreModeOverlay />
           <MapZoomTracker />
           <SpotManager />
+          <LoreLayer />
           <MapFitter />
           {showCinematic && (
             <CinematicSequence onComplete={handleCinematicComplete} />

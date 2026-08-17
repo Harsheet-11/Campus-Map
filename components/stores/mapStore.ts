@@ -11,9 +11,13 @@ type MapStore = {
   setMode: (mode: MapMode) => void;
   toggleMode: () => void;
 
-  // ── Zoom ────
+  // ── Zoom
   zoom: number;
   setZoom: (zoom: number) => void;
+
+  // ── Sheet
+  sheet: SheetType;
+  setSheet: (sheet: SheetType) => void;
 
   // ── Cinematic
   hasDoneOpeningCinematic: boolean;
@@ -23,16 +27,27 @@ type MapStore = {
 export const useMapStore = create<MapStore>((set, get) => ({
   // ── Mode
   mode: "general",
-  setMode: (mode) => set({ mode }),
-  toggleMode: () =>
-    set({ mode: get().mode === "general" ? "lore" : "general" }),
 
-  // ── Zoom ─────────────────────────────────────
+  setMode: (mode) => set({ mode }),
+
+  toggleMode: () =>
+    set({
+      mode: get().mode === "general" ? "lore" : "general",
+    }),
+
+  // ── Zoom
   zoom: 16,
+
   setZoom: (zoom) => set({ zoom }),
+
+  // ── Sheet
+  sheet: null,
+
+  setSheet: (sheet) => set({ sheet }),
 
   // ── Cinematic
   hasDoneOpeningCinematic: false,
+
   setHasDoneOpeningCinematic: (value) =>
     set({ hasDoneOpeningCinematic: value }),
 }));

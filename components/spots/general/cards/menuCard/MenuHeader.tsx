@@ -51,11 +51,7 @@ export default function MenuHeader({
             active:scale-90
           "
         >
-          <HugeiconsIcon
-            icon={Cancel01Icon}
-            size={15}
-            strokeWidth={2.5}
-          />
+          <HugeiconsIcon icon={Cancel01Icon} size={15} strokeWidth={2.5} />
         </button>
 
         {/* Logo */}
@@ -114,14 +110,17 @@ export default function MenuHeader({
         </div>
 
         {/* Title */}
-        <div className="relative z-10 mx-auto mt-4 max-w-[330px] text-center">
+        <div className="relative z-10 mt-4 w-full px-4 text-center">
           <h1
             className="
-              text-[26px]
-              font-black
-              leading-[1.05]
-              text-[#191919]
-            "
+      mx-auto
+      max-w-[360px]
+      text-center
+      text-[32px]
+      font-black
+      leading-[1.05]
+      text-[#191919]
+    "
             style={{ letterSpacing: "-0.045em" }}
           >
             {spot.name}
@@ -129,19 +128,19 @@ export default function MenuHeader({
 
           <p
             className="
-              mx-auto mt-2
-              max-w-[290px]
-              line-clamp-2
-              text-[12px]
-              font-semibold
-              leading-[1.45]
-              text-[#805C16]
-            "
+      mx-auto mt-2
+      max-w-[290px]
+      text-center
+      line-clamp-2
+      text-[12px]
+      font-semibold
+      leading-[1.45]
+      text-[#805C16]
+    "
           >
             {spot.description}
           </p>
         </div>
-
         {/* Small playful accent */}
         <div
           className="
@@ -179,4 +178,3 @@ export default function MenuHeader({
     </div>
   );
 }
-

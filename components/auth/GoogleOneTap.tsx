@@ -15,10 +15,11 @@ const generateNonce = async (): Promise<[string, string]> => {
     throw new Error("Web Crypto API is not available");
   }
 
+  const randomBytes = new Uint8Array(32);
+  window.crypto.getRandomValues(randomBytes);
+
   const nonce = btoa(
-    String.fromCharCode(
-      ...window.crypto.getRandomValues(new Uint8Array(32)),
-    ),
+    String.fromCharCode(...Array.from(randomBytes)),
   );
 
   const encoder = new TextEncoder();
@@ -54,9 +55,6 @@ export default function GoogleOneTap() {
       google.accounts.id.initialize({
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
         nonce: hashedNonce,
-
-        // Only allow NITR accounts
-        hd: "nitrkl.ac.in",
 
         use_fedcm_for_prompt: true,
 

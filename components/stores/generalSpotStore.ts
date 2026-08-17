@@ -3,7 +3,7 @@ import type { PermanentSpot } from "@/lib/types";
 
 type SpotAction = "POPUP" | "MENU_CARD" | "COMP_FORM" | "NONE" | null;
 
-type SpotStore = {
+type GeneralSpotStore = {
   selectedSpot: PermanentSpot | null;
   action: SpotAction;
 
@@ -13,7 +13,7 @@ type SpotStore = {
   clearSpot: () => void;
 };
 
-export const useSpotStore = create<SpotStore>((set) => ({
+export const useSpotStore = create<GeneralSpotStore>((set) => ({
   selectedSpot: null,
   action: null,
 

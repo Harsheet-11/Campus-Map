@@ -27,7 +27,6 @@ export async function fetchCanteenFood(
   }
 
   const data: CanteenFoodResponse = await res.json();
-
   return data;
 }
 
@@ -36,5 +35,6 @@ export function useCanteenFood(canteenId: string) {
     queryKey: ["canteen-food", canteenId],
     queryFn: () => fetchCanteenFood(canteenId),
     enabled: !!canteenId,
+    staleTime: 1000 * 30,
   });
 }

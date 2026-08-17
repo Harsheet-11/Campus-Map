@@ -4,18 +4,19 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import { CAMPUS_BOUNDS } from "@/lib/campusBounds";
-import { useMapStore }   from "@/components/stores/mapStore";
+import { useMapStore } from "@/components/stores/mapStore";
 
 export default function MapFitter() {
   const map = useMap();
-  const isSheetOpen = useMapStore((s) => s.isSheetOpen);
+  const sheet = useMapStore((s) => s.sheet);
+  const isSheetOpen = sheet !== null;
 
   useEffect(() => {
     const fitMap = () => {
       if (isSheetOpen) return;
       const bounds = L.latLngBounds(
         [CAMPUS_BOUNDS.SW.lat, CAMPUS_BOUNDS.SW.lng],
-        [CAMPUS_BOUNDS.NE.lat, CAMPUS_BOUNDS.NE.lng]
+        [CAMPUS_BOUNDS.NE.lat, CAMPUS_BOUNDS.NE.lng],
       );
 
       const isMobile = window.innerWidth < 768;

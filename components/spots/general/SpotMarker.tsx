@@ -4,11 +4,9 @@ import { useMemo } from "react";
 import { Marker, Popup } from "react-leaflet";
 
 import type { PermanentSpot } from "@/lib/types";
-
-import { createSpotIcon } from "@/components/spots/SpotIcon";
-import SpotPopup from "@/components/cards/SpotPopup";
-
-import { useSpotStore } from "@/components/stores/spotStore";
+import { createSpotIcon } from "@/components/spots/general/SpotIcon";
+import SpotPopup from "@/components/spots/general/cards/SpotPopup";
+import { useSpotStore } from "@/components/stores/generalSpotStore";
 
 export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
   const icon = useMemo(() => createSpotIcon(spot), [spot.id]);

@@ -5,6 +5,7 @@ import type { PermanentSpot } from "@/lib/types";
 import MenuHeader from "./MenuHeader";
 import DishesTab from "./DishesTab";
 import SuggestTab from "./SuggestTab";
+import LoginPopup from "@/components/spots/general/cards/LoginPopup";
 
 export default function MenuCard({
   spot,
@@ -14,6 +15,24 @@ export default function MenuCard({
   onClose?: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"dishes" | "suggest">("dishes");
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  const handleLoginRequired = () => {
+    setShowLoginPopup(true);
+  };
+
+  const handleLoginPopupClose = () => {
+    setShowLoginPopup(false);
+  };
+
+  // Login popup is shown instead of the menu
+  if (showLoginPopup) {
+    return (
+      <LoginPopup
+        onClose={handleLoginPopupClose}
+      />
+    );
+  }
 
   return (
     <div
@@ -37,7 +56,6 @@ export default function MenuCard({
                   ? "bg-[#FFCC33] text-gray-900 shadow-sm"
                   : "bg-transparent text-gray-500"
               }`}
-              style={{ letterSpacing: "-0.005em" }}
             >
               Top Dishes
             </button>
@@ -49,7 +67,6 @@ export default function MenuCard({
                   ? "bg-[#FFCC33] text-gray-900 shadow-sm"
                   : "bg-transparent text-gray-500"
               }`}
-              style={{ letterSpacing: "-0.005em" }}
             >
               Suggest a Dish
             </button>
@@ -59,7 +76,10 @@ export default function MenuCard({
         {/* CONTENT */}
         <div className="flex-1 min-h-0 flex flex-col px-4 pb-4">
           {activeTab === "dishes" ? (
-            <DishesTab canteenId={spot.id} />
+            <DishesTab
+              canteenId={spot.id}
+              onLoginRequired={handleLoginRequired}
+            />
           ) : (
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
               <SuggestTab canteenId={spot.id} />
@@ -70,4 +90,3 @@ export default function MenuCard({
     </div>
   );
 }
-
