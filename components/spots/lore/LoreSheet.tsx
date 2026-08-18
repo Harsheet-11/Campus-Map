@@ -1,9 +1,9 @@
 "use client";
 
-import type { LoreStory } from "@/lib/types";
+import type { LoreSpot } from "@/lib/types";
 
 interface LoreSheetProps {
-  story: LoreStory;
+  story: LoreSpot;
   onClose: () => void;
 }
 

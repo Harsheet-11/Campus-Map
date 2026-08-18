@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import { CAMPUS_BOUNDS } from "@/lib/campusBounds";
-import { useMapStore } from "@/components/stores/mapStore";
+import { useMapStore } from "@/stores/mapStore";
 
 export default function MapFitter() {
   const map = useMap();

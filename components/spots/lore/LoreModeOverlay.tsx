@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
-import { useMapStore } from "@/components/stores/mapStore";
+import { useMapStore } from "@/stores/mapStore";
 
 export default function LoreModeOverlay() {
   const map = useMap();

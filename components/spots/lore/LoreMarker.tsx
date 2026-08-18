@@ -1,36 +1,42 @@
 "use client";
 
+import { useMemo } from "react";
 import { Marker } from "react-leaflet";
-import L from "leaflet";
-import type { LoreStory } from "@/lib/types";
-import { useLoreStore } from "@/components/stores/loreStore";
+
+import { createLoreIcon } from "@/components/spots/lore/LoreIcon";
+import type { LoreSpot } from "@/lib/types";
+import { useLoreStore } from "@/stores/loreSpotStore";
 
 interface Props {
-  story: LoreStory;
+  spot: LoreSpot;
 }
 
-const icon = L.divIcon({
-  className: "",
-  html: `<div style="font-size: 28px;">📍</div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 32],
-});
+export default function LoreMarker({ spot }: Props) {
+  const icon = useMemo(
+    () => createLoreIcon(spot),
+    [spot]
+  );
 
-export default function LoreMarker({ story }: Props) {
-  console.log("LoreMarker received:", story);
-  const selectLore = useLoreStore((s) => s.selectLore);
-  const openAction = useLoreStore((s) => s.openAction);
+  const setSelectedLore = useLoreStore(
+    (s) => s.setSelectedLore
+  );
+
+  const setAction = useLoreStore(
+    (s) => s.setAction
+  );
 
   const handleClick = () => {
-    selectLore(story);
-    openAction("LORE_SHEET");
+    setSelectedLore(spot);
+    setAction("LORE_SHEET");
   };
 
   return (
     <Marker
-      position={[story.lat, story.lng]}
+      position={[spot.lat, spot.lng]}
       icon={icon}
-      eventHandlers={{ click: handleClick }}
+      eventHandlers={{
+        click: handleClick,
+      }}
     />
   );
 }

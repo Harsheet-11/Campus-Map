@@ -1,13 +1,13 @@
 "use client";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useSpotStore } from "@/components/stores/generalSpotStore";
+import { useGeneralSpotStore } from "@/stores/generalSpotStore";
 import MenuCard from "@/components/spots/general/cards/menuCard/MenuCard";
 
 export default function SpotDialog() {
-  const action = useSpotStore((a) => a.action);
-  const selectedSpot = useSpotStore((s) => s.selectedSpot);
-  const clearSpot = useSpotStore((c) => c.clearSpot);
+  const action = useGeneralSpotStore((a) => a.action);
+  const selectedSpot = useGeneralSpotStore((s) => s.selectedSpot);
+  const clearSpot = useGeneralSpotStore((c) => c.clearSpot);
 
   return (
     <Dialog 

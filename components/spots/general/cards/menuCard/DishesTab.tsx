@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useCanteenFood } from "@/hooks/useCanteenFood";
-import { useUserStore } from "@/components/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 
 export default function DishesTab({
   canteenId,

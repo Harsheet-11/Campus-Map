@@ -6,34 +6,35 @@ import { Marker, Popup } from "react-leaflet";
 import type { PermanentSpot } from "@/lib/types";
 import { createSpotIcon } from "@/components/spots/general/SpotIcon";
 import SpotPopup from "@/components/spots/general/cards/SpotPopup";
-import { useSpotStore } from "@/components/stores/generalSpotStore";
+import { useGeneralSpotStore } from "@/stores/generalSpotStore";
 
 export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
+  
   const icon = useMemo(() => createSpotIcon(spot), [spot.id]);
 
-  const selectSpot = useSpotStore((state) => state.selectSpot);
+  const setSelectedSpot = useGeneralSpotStore((state) => state.setSelectedSpot);
 
-  const openAction = useSpotStore((state) => state.openAction);
+  const setAction = useGeneralSpotStore((state) => state.setAction);
 
   function handleClick() {
 
-    selectSpot(spot);
+    setSelectedSpot(spot);
 
     switch (spot.click_action) {
       case "MENU_CARD":
-        openAction("MENU_CARD");
+        setAction("MENU_CARD");
         break;
 
       case "COMP_FORM":
-        openAction("COMP_FORM");
+        setAction("COMP_FORM");
         break;
 
       case "POPUP":
-        openAction(null);
+        setAction(null);
         break;
 
       case "NONE":
-        openAction(null);
+        setAction(null);
         break;
     }
   }
@@ -42,9 +43,7 @@ export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
     <Marker
       position={[spot.lat, spot.lng]}
       icon={icon}
-      eventHandlers={{
-        click: handleClick,
-      }}
+      eventHandlers={{ click: handleClick}}
     >
       {spot.click_action === "POPUP" && (
         <Popup className="spot-popup" closeButton={false}>

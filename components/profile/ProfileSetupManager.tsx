@@ -3,8 +3,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore } from "@/components/stores/userStore";
-import { useModalStore } from "@/components/stores/modalStore";
+import { useUserStore } from "@/stores/userStore";
+import { useModalStore } from "@/stores/modalStore";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ProfileSetupManager() {

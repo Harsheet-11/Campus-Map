@@ -7,7 +7,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("lore_stories")
-    .select("id, title, content, lat, lng, is_canon, chill_count")
+    .select("id, title, content, lat, lng, is_canon, chill_count, icon")
     .eq("approved", true)
     .order("created_at", { ascending: false });
 
@@ -18,7 +18,7 @@ export async function GET() {
     );
   }
 
-  const stories = (data ?? []).map((row) => ({
+  const lore = (data ?? []).map((row) => ({
     id: row.id,
     title: row.title,
     content: row.content,
@@ -26,7 +26,8 @@ export async function GET() {
     lng: Number(row.lng),
     is_canon: row.is_canon,
     chill_count: row.chill_count,
+    icon: row.icon,
   }));
 
-  return NextResponse.json({ stories });
+  return NextResponse.json({ lore });
 }

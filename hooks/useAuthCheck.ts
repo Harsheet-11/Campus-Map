@@ -9,7 +9,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useUserStore } from "@/components/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 import { useMemo } from "react";
 
 export type AuthState =

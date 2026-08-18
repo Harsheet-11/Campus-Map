@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
 import { Input } from "@/components/ui/input";
-import { useUserStore } from "@/components/stores/userStore";
-import { useModalStore } from "@/components/stores/modalStore";
+import { useUserStore } from "@/stores/userStore";
+import { useModalStore } from "@/stores/modalStore";
 
 async function sha256(text: string): Promise<string> {
   // crypto.subtle is only available on HTTPS / localhost (secure contexts)

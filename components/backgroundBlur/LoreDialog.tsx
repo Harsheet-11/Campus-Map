@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useLoreStore } from "@/components/stores/loreStore";
+import { useLoreStore } from "@/stores/loreSpotStore";
 import LoreSheet from "@/components/spots/lore/LoreSheet";
 
 export default function LoreDialog() {

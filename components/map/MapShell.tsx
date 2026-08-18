@@ -13,13 +13,14 @@ import {
   MAX_ZOOM,
 } from "@/lib/campusBounds";
 
-import { useMapStore } from "@/components/stores/mapStore";
+import { useMapStore } from "@/stores/mapStore";
 import MapFitter from "@/components/map/MapFitter";
 import CinematicSequence from "@/components/map/CinematicSequence";
 import ModeToggle from "@/components/map/ModeToggle";
 import MapZoomTracker from "@/components/spots/MapZoomTracker";
 import SpotManager from "@/components/spots/SpotManager";
-import CardDialog from "../bgDialog/SpotDialog";
+import CardDialog from "../backgroundBlur/GeneralSpotDialog";
+import LoreDialog from "@/components/backgroundBlur/LoreDialog";
 
 import LoreModeOverlay from "@/components/spots/lore/LoreModeOverlay";
 import LoreLayer from "../spots/lore/LoreLayer";
@@ -92,6 +93,7 @@ export default function MapShell() {
       </div>
       <ModeToggle />
       <CardDialog/>
+      <LoreDialog />
     </div>
   );
 }

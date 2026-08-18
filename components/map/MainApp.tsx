@@ -1,7 +1,6 @@
 "use client";
 
-import AppDialog from "@/components/bgDialog/AppDialog";
-import LoreDialog from "@/components/bgDialog/LoreDialog";
+import AppDialog from "@/components/backgroundBlur/AppDialog";
 import ProfileIcon from "@/components/profile/ProfileIcon";
 import ProfileLoader from "@/components/profile/ProfileLoader";
 import ProfileSetupManager from "@/components/profile/ProfileSetupManager";
@@ -29,7 +28,6 @@ export default function MainApp() {
       <ProfileLoader />
       <ProfileSetupManager />
       <AppDialog />
-      <LoreDialog />
       <ProfileIcon />
     </>
   );

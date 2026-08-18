@@ -3,7 +3,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserStore } from "@/components/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 
 export default function ProfileLoader() {
   const setUser      = useUserStore((state) => state.setUser);

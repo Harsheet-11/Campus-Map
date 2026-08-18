@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useMapStore } from "@/components/stores/mapStore";
+import { useMapStore } from "@/stores/mapStore";
 
 export default function ModeToggle() {
   const mode = useMapStore((s) => s.mode);

@@ -6,11 +6,8 @@ export function createSpotIcon(spot: PermanentSpot) {
 
   return L.divIcon({
     className: "",
-
     html,
-
     iconSize: getIconSize(spot),
-
     iconAnchor: getIconAnchor(spot),
   });
 }

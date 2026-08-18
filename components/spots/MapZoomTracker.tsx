@@ -1,6 +1,6 @@
 "use client";
 
-import { useMapStore } from "@/components/stores/mapStore";
+import { useMapStore } from "@/stores/mapStore";
 import { useMapEvents } from "react-leaflet";
 
 export default function MapZoomTracker() {

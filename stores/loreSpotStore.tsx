@@ -4,25 +4,27 @@ import type { LoreStory } from "@/lib/types";
 type LoreAction = "LORE_SHEET" | "LORE_FORM" | "NONE" | null;
 
 type LoreStore = {
-  selectedLore: LoreStory | null;
-  action: LoreAction;
 
-  selectLore: (story: LoreStory) => void;
-  openAction: (action: LoreAction) => void;
+  selectedLore: LoreStory | null;
+  setSelectedLore: (story: LoreStory | null) => void;
+
+  action: LoreAction;
+  setAction: (action: LoreAction) => void;
+  
   clearLore: () => void;
 };
 
 export const useLoreStore = create<LoreStore>((set) => ({
   selectedLore: null,
-  action: null,
 
-  selectLore: (story) => {
+  setSelectedLore: (story) => {
     set({
       selectedLore: story,
     });
   },
 
-  openAction: (action) => {
+  action: null,
+  setAction: (action) => {
     set({
       action,
     });
