@@ -4,6 +4,7 @@ import AppDialog from "@/components/backgroundBlur/AppDialog";
 import ProfileIcon from "@/components/profile/ProfileIcon";
 import ProfileLoader from "@/components/profile/ProfileLoader";
 import ProfileSetupManager from "@/components/profile/ProfileSetupManager";
+import ScareOverlay from "@/components/features/lore/scare/ScareOverlay";
 
 import dynamic from "next/dynamic";
 
@@ -29,6 +30,7 @@ export default function MainApp() {
       <ProfileSetupManager />
       <AppDialog />
       <ProfileIcon />
+      <ScareOverlay />
     </>
   );
 }

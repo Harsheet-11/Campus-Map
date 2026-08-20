@@ -1,6 +1,6 @@
 import type { PermanentSpot } from "@/lib/types";
 
-export default function SpotPopup({ spot }: { spot: PermanentSpot }) {
+export default function GeneralPopup({ spot }: { spot: PermanentSpot }) {
   return (
     <div className="spot-card">
       <div className="spot-card-arrow" />

@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { Marker, Popup } from "react-leaflet";
 
 import type { PermanentSpot } from "@/lib/types";
-import { createSpotIcon } from "@/components/spots/general/SpotIcon";
-import SpotPopup from "@/components/spots/general/cards/SpotPopup";
+import { createSpotIcon } from "@/components/features/general/GeneralIcon";
+import GeneralPopup from "@/components/features/general/components/GeneralPopup";
 import { useGeneralSpotStore } from "@/stores/generalSpotStore";
 
 export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
@@ -47,7 +47,7 @@ export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
     >
       {spot.click_action === "POPUP" && (
         <Popup className="spot-popup" closeButton={false}>
-          <SpotPopup spot={spot} />
+          <GeneralPopup spot={spot} />
         </Popup>
       )}
     </Marker>

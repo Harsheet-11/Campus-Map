@@ -1,39 +1,59 @@
 import { create } from "zustand";
-import type { LoreStory } from "@/lib/types";
+import type { LoreSpot } from "@/lib/types";
 
-type LoreAction = "LORE_SHEET" | "LORE_FORM" | "NONE" | null;
+export type LoreAction = "LORE_SHEET" | "LORE_FORM" | null;
 
-type LoreStore = {
+export type ScarePhase = "SCARE" | "ROAST" | null;
 
-  selectedLore: LoreStory | null;
-  setSelectedLore: (story: LoreStory | null) => void;
-
+interface LoreStore {
+  selectedLore: LoreSpot | null;
   action: LoreAction;
+
+  scarePhase: ScarePhase;
+
+  hasTriggeredFirstScare: boolean;
+
+  setSelectedLore: (spot: LoreSpot | null) => void;
   setAction: (action: LoreAction) => void;
-  
+
+  setScarePhase: (phase: ScarePhase) => void;
+  setHasTriggeredFirstScare: (value: boolean) => void;
+
   clearLore: () => void;
-};
+}
 
 export const useLoreStore = create<LoreStore>((set) => ({
   selectedLore: null,
-
-  setSelectedLore: (story) => {
-    set({
-      selectedLore: story,
-    });
-  },
-
   action: null,
-  setAction: (action) => {
+
+  scarePhase: null,
+
+  hasTriggeredFirstScare: false,
+
+  setSelectedLore: (spot) =>
+    set({
+      selectedLore: spot,
+    }),
+
+  setAction: (action) =>
     set({
       action,
-    });
-  },
+    }),
 
-  clearLore: () => {
+  setScarePhase: (phase) =>
+    set({
+      scarePhase: phase,
+    }),
+
+  setHasTriggeredFirstScare: (value) =>
+    set({
+      hasTriggeredFirstScare: value,
+    }),
+
+  clearLore: () =>
     set({
       selectedLore: null,
       action: null,
-    });
-  },
+      scarePhase: null,
+    }),
 }));

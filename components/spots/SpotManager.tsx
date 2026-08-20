@@ -1,9 +1,9 @@
 "use client";
 
 import { useSpots } from "@/hooks/useSpots";
-import { useLore } from "@/hooks/useLoreStories";
-import SpotMarker from "@/components/spots/general/SpotMarker";
-import LoreMarker from "@/components/spots/lore/LoreMarker";
+import { useLore } from "@/hooks/useLore";
+import SpotMarker from "@/components/features/general/GeneralMarker";
+import LoreMarker from "@/components/features/lore/LoreMarker";
 import { useMapStore } from "@/stores/mapStore";
 
 export default function SpotManager() {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/stores/userStore";
 import { useModalStore } from "@/stores/modalStore";
-import LoginPopup from "@/components/spots/general/cards/LoginPopup";
+import LoginPopup from "@/components/features/general/components/LoginPopup";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ProfileIcon() {

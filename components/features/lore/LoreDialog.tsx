@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useLoreStore } from "@/stores/loreSpotStore";
-import LoreSheet from "@/components/spots/lore/LoreSheet";
+import LoreSheet from "@/components/features/lore/components/LoreSheet";
 
 export default function LoreDialog() {
   const action = useLoreStore((s) => s.action);

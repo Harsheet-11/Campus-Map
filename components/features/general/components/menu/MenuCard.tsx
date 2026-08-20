@@ -5,7 +5,7 @@ import type { PermanentSpot } from "@/lib/types";
 import MenuHeader from "./MenuHeader";
 import DishesTab from "./DishesTab";
 import SuggestTab from "./SuggestTab";
-import LoginPopup from "@/components/spots/general/cards/LoginPopup";
+import LoginPopup from "@/components/features/general/components/LoginPopup";
 
 export default function MenuCard({
   spot,

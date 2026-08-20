@@ -19,11 +19,11 @@ import CinematicSequence from "@/components/map/CinematicSequence";
 import ModeToggle from "@/components/map/ModeToggle";
 import MapZoomTracker from "@/components/spots/MapZoomTracker";
 import SpotManager from "@/components/spots/SpotManager";
-import CardDialog from "../backgroundBlur/GeneralSpotDialog";
-import LoreDialog from "@/components/backgroundBlur/LoreDialog";
+import CardDialog from "../features/general/GeneralSpotDialog";
+import LoreDialog from "@/components/features/lore/LoreDialog";
 
-import LoreModeOverlay from "@/components/spots/lore/LoreModeOverlay";
-import LoreLayer from "../spots/lore/LoreLayer";
+import LoreModeOverlay from "@/components/features/lore/LoreModeOverlay";
+import LoreLayer from "../features/lore/LoreLayer";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
   ._getIconUrl;

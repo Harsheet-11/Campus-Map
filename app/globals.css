@@ -1,3 +1,4 @@
+
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @tailwind base;
@@ -302,166 +303,21 @@
 
 
 /* ===============================
-   FLOATING GHOSTS
+   Lore Shett
 ================================ */
 
+.lore-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
-.ghost {
-
-  position: absolute;
-
-  font-size: 40px;
-
-  opacity: 0.18;
-
-  filter:
-    blur(0.3px) drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
-
-
+.lore-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 
-
-.ghost-1 {
-
-  left: 20%;
-
-  bottom: -50px;
-
-  animation:
-    ghost-float-1 18s linear infinite;
-
-}
-
-
-
-.ghost-2 {
-
-  left: 55%;
-
-  bottom: -80px;
-
-  font-size: 30px;
-
-  animation:
-    ghost-float-2 25s linear infinite;
-
-}
-
-
-
-.ghost-3 {
-
-  left: 80%;
-
-  bottom: -100px;
-
-  font-size: 45px;
-
-  animation:
-    ghost-float-3 30s linear infinite;
-
-}
-
-
-
-
-
-@keyframes ghost-float-1 {
-
-  0% {
-
-    transform:
-      translateY(0) translateX(0) rotate(0deg);
-
-    opacity: 0;
-
-  }
-
-
-  20% {
-
-    opacity: .18;
-
-  }
-
-
-  100% {
-
-    transform:
-      translateY(-120vh) translateX(60px) rotate(15deg);
-
-    opacity: 0;
-
-  }
-
-}
-
-
-
-
-@keyframes ghost-float-2 {
-
-  0% {
-
-    transform:
-      translateY(0) translateX(0);
-
-    opacity: 0;
-
-  }
-
-
-  30% {
-
-    opacity: .15;
-
-  }
-
-
-  100% {
-
-    transform:
-      translateY(-120vh) translateX(-80px);
-
-    opacity: 0;
-
-  }
-
-}
-
-
-
-
-@keyframes ghost-float-3 {
-
-  0% {
-
-    transform:
-      translateY(0);
-
-    opacity: 0;
-
-  }
-
-
-  25% {
-
-    opacity: .2;
-
-  }
-
-
-  100% {
-
-    transform:
-      translateY(-120vh) translateX(-40px);
-
-    opacity: 0;
-
-  }
-
-}
 
 /* ─── Spot Marker Base ───────────────────────────────────────────── */
 
