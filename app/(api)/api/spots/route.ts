@@ -1,7 +1,30 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import redis from "@/lib/redis/redis";
 
 export async function GET() {
+  const cacheKey = "spots:all";
+
+  // Check Redis
+  try {
+    const cached = await redis.get<{ spots: unknown[] }>(cacheKey);
+
+    if (cached) {
+      console.log("REDIS HIT");
+
+      return NextResponse.json(cached, {
+        headers: {
+          "X-Cache": "HIT",
+        },
+      });
+    }
+
+    console.log("REDIS MISS");
+  } catch (error) {
+    console.error("Error fetching spots from Redis:", error);
+  }
+
+  // Get from Supabase
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -33,12 +56,8 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      {
-        error: "Could not load spots",
-      },
-      {
-        status: 500,
-      },
+      { error: "Could not load spots" },
+      { status: 500 },
     );
   }
 
@@ -59,7 +78,24 @@ export async function GET() {
       : (row.icons ?? null),
   }));
 
-  return NextResponse.json({
+  const response = {
     spots,
+  };
+
+  // Save to Redis
+  try {
+    await redis.set(cacheKey, response, {
+      ex: 300,
+    });
+
+    console.log("SAVED TO REDIS");
+  } catch (error) {
+    console.error("Error saving spots to Redis:", error);
+  }
+
+  return NextResponse.json(response, {
+    headers: {
+      "X-Cache": "MISS",
+    },
   });
 }
