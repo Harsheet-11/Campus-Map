@@ -1,8 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    allowedDevOrigins: [
+  allowedDevOrigins: [
     "http://192.168.29.212:3000",
   ],
+
+  async headers() {
+    return [
+      {
+        source: "/tiles/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

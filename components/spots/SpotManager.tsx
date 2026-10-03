@@ -1,19 +1,16 @@
 "use client";
 
 import { useSpots } from "@/hooks/useSpots";
-import { useLore } from "@/hooks/useLore";
 import SpotMarker from "@/components/features/general/GeneralMarker";
-import LoreMarker from "@/components/features/lore/LoreMarker";
 import { useMapStore } from "@/stores/mapStore";
 
 export default function SpotManager() {
-  const { data: spots = [], isLoading: spotsLoading } = useSpots();
-  const { data: lore = [], isLoading: loreLoading } = useLore();
+  const { data: spots = [], isLoading } = useSpots();
 
   const zoom = useMapStore((state) => state.zoom);
   const mode = useMapStore((state) => state.mode);
 
-  if (spotsLoading || loreLoading) return null;
+  if (isLoading) return null;
 
   const visibleSpots = spots.filter(
     (spot) =>
@@ -21,24 +18,16 @@ export default function SpotManager() {
       zoom >= spot.min_zoom
   );
 
+  if (mode === "lore") return null;
+
   return (
     <>
-      {mode !== "lore" &&
-        visibleSpots.map((spot) => (
-          <SpotMarker
-            key={spot.id}
-            spot={spot}
-          />
-        ))}
-
-      {/* Lore markers */}
-      {mode === "lore" &&
-        lore.map((story) => (
-          <LoreMarker
-            key={story.id}
-            spot={story}
-          />
-        ))}
+      {visibleSpots.map((spot) => (
+        <SpotMarker
+          key={spot.id}
+          spot={spot}
+        />
+      ))}
     </>
   );
 }

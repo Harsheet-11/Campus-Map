@@ -27,11 +27,14 @@ import LoreLayer from "../features/lore/LoreLayer";
 
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
   ._getIconUrl;
+
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
 const CINEMATIC_KEY = "nitr-cinematic-done";
@@ -39,11 +42,12 @@ const CINEMATIC_KEY = "nitr-cinematic-done";
 export default function MapShell() {
   const [mounted, setMounted] = useState(false);
   const [showCinematic, setShowCinematic] = useState(false);
-  // Zustand hooks must be here
+
   const mode = useMapStore((s) => s.mode);
 
   useEffect(() => {
     const done = localStorage.getItem(CINEMATIC_KEY) === "true";
+
     setShowCinematic(!done);
     setMounted(true);
   }, []);
@@ -60,7 +64,7 @@ export default function MapShell() {
   );
 
   return (
-    <div className="relative w-full h-screen overflow-hidden isolate">
+    <div className="relative h-screen w-full overflow-hidden isolate">
       <div className="absolute inset-0">
         <MapContainer
           center={[CAMPUS_CENTER.lat, CAMPUS_CENTER.lng]}
@@ -74,25 +78,30 @@ export default function MapShell() {
           style={{ width: "100%", height: "100%" }}
         >
           <TileLayer
-            url="/tiles/{z}/{x}/{y}.png"
+            url="/tiles/{z}/{x}/{y}.webp"
             minZoom={MIN_ZOOM}
             maxZoom={MAX_ZOOM}
+            keepBuffer={1}
+            updateWhenIdle={true}
             errorTileUrl="/error-tile.png"
             attribution=""
             className={mode === "lore" ? "lore-tiles" : ""}
           />
+
           <LoreModeOverlay />
           <MapZoomTracker />
           <SpotManager />
           <LoreLayer />
           <MapFitter />
+
           {showCinematic && (
             <CinematicSequence onComplete={handleCinematicComplete} />
           )}
         </MapContainer>
       </div>
+
       <ModeToggle />
-      <CardDialog/>
+      <CardDialog />
       <LoreDialog />
     </div>
   );

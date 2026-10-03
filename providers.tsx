@@ -1,8 +1,22 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
 import { useState } from "react";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import { Toaster } from "react-hot-toast";
+
+const storage = {
+  getItem: async (key: string) => {
+    return localStorage.getItem(key);
+  },
+  setItem: async (key: string, value: string) => {
+    localStorage.setItem(key, value);
+  },
+  removeItem: async (key: string) => {
+    localStorage.removeItem(key);
+  },
+};
 
 export default function Providers({
   children,
@@ -14,14 +28,29 @@ export default function Providers({
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000,
+            staleTime: 5 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
+            retry: 1,
+            refetchOnWindowFocus: false,
           },
         },
-      })
+      }),
+  );
+
+  const [persister] = useState(() =>
+    createAsyncStoragePersister({
+      storage,
+    }),
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        maxAge: 24 * 60 * 60 * 1000,
+      }}
+    >
       {children}
       <Toaster
         position="top-center"
@@ -33,6 +62,6 @@ export default function Providers({
           },
         }}
       />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }

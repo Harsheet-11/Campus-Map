@@ -5,11 +5,11 @@ import { Marker } from "react-leaflet";
 
 import { createLoreIcon } from "@/components/features/lore/LoreIcon";
 import { useScare } from "@/hooks/useScare";
-import type { LoreSpot } from "@/lib/types";
+import type { LoreSpotFull } from "@/lib/types";
 import { useLoreStore } from "@/stores/loreSpotStore";
 
 interface Props {
-  spot: LoreSpot;
+  spot: LoreSpotFull;
   jumpScaresEnabled: boolean;
 }
 

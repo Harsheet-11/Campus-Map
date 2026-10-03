@@ -1,19 +1,18 @@
 import { create } from "zustand";
-import type { LoreSpot } from "@/lib/types";
+import type { LoreSpotFull } from "@/lib/types";
 
 export type LoreAction = "LORE_SHEET" | "LORE_FORM" | null;
 
 export type ScarePhase = "SCARE" | "ROAST" | null;
 
 interface LoreStore {
-  selectedLore: LoreSpot | null;
+  selectedLore: LoreSpotFull | null;
   action: LoreAction;
 
   scarePhase: ScarePhase;
-
   hasTriggeredFirstScare: boolean;
 
-  setSelectedLore: (spot: LoreSpot | null) => void;
+  setSelectedLore: (spot: LoreSpotFull | null) => void;
   setAction: (action: LoreAction) => void;
 
   setScarePhase: (phase: ScarePhase) => void;
@@ -27,7 +26,6 @@ export const useLoreStore = create<LoreStore>((set) => ({
   action: null,
 
   scarePhase: null,
-
   hasTriggeredFirstScare: false,
 
   setSelectedLore: (spot) =>

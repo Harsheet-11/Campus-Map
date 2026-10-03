@@ -1,82 +1,160 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import redis from "@/lib/redis/redis";
-import type { FoodItem } from "@/lib/types";
 
-export async function GET(
+export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ "item-id": string }> },
 ) {
   const supabase = await createClient();
-  const { id: canteenId } = await params;
+  const { "item-id": foodItemId } = await params;
 
-  const cacheKey = `food:canteen:${canteenId}`;
+  // Check authentication
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // 1. Try Redis for food items (not user_votes — those are always live)
-  let foodItems: FoodItem[] | null = null;
+  if (!user) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 },
+    );
+  }
+
+  // Validate request body
+  let body: { vote_type?: "UP" | "DOWN" };
 
   try {
-    const cached = await redis.get<FoodItem[]>(cacheKey);
-    if (cached) {
-      console.log("REDIS HIT", cacheKey);
-      foodItems = cached;
-    } else {
-      console.log("REDIS MISS", cacheKey);
-    }
-  } catch (err) {
-    console.error("Redis read error:", err);
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
 
-  // 2. If no cache, fetch from Supabase
-  if (!foodItems) {
-    const { data, error } = await supabase
-      .from("food_items")
-      .select("id, dish_name, review, upvotes, downvotes, score, canteen_id")
-      .eq("canteen_id", canteenId)
-      .eq("approved", true)
-      .order("score", { ascending: false });
-
-    if (error) {
-      console.error("SUPABASE GET ERROR:", error);
-      return NextResponse.json(
-        { error: "Could not fetch food items", details: error.message },
-        { status: 500 },
-      );
-    }
-
-    foodItems = data ?? [];
-
-    // 3. Save to Redis
-    try {
-      await redis.set(cacheKey, foodItems, { ex: 60 });
-      console.log("SAVED TO REDIS", cacheKey);
-    } catch (err) {
-      console.error("Redis write error:", err);
-    }
+  if (body.vote_type !== "UP" && body.vote_type !== "DOWN") {
+    return NextResponse.json(
+      { error: "vote_type must be UP or DOWN" },
+      { status: 400 },
+    );
   }
 
-  // 4. user_votes is always fetched live — never cached
-  const { data: { user } } = await supabase.auth.getUser();
-  let userVotes: Record<string, "UP" | "DOWN"> = {};
+  // Find food item + canteen for cache invalidation
+  const { data: foodItem, error: foodItemError } = await supabase
+    .from("food_items")
+    .select("id, canteen_id")
+    .eq("id", foodItemId)
+    .single();
 
-  if (user && foodItems && foodItems.length > 0) {
-    const foodItemIds = foodItems.map((item) => item.id);
-
-    const { data: votes, error: votesError } = await supabase
-      .from("food_votes")
-      .select("food_item_id, vote_type")
-      .eq("user_id", user.id)
-      .in("food_item_id", foodItemIds);
-
-    if (!votesError && votes) {
-      userVotes = Object.fromEntries(
-        votes.map((v) => [v.food_item_id, v.vote_type]),
-      ) as Record<string, "UP" | "DOWN">;
-    }
+  if (foodItemError || !foodItem) {
+    return NextResponse.json(
+      { error: "Food item not found" },
+      { status: 404 },
+    );
   }
 
-  return NextResponse.json({
-    food_items: foodItems,
-    user_votes: userVotes,
-  });
+  // Create/update user's vote
+  const { data: vote, error: voteError } = await supabase
+    .from("food_votes")
+    .upsert(
+      {
+        food_item_id: foodItemId,
+        user_id: user.id,
+        vote_type: body.vote_type,
+      },
+      {
+        onConflict: "food_item_id,user_id",
+      },
+    )
+    .select("food_item_id, vote_type")
+    .single();
+
+  if (voteError) {
+    console.error("FOOD VOTE ERROR:", voteError);
+
+    return NextResponse.json(
+      { error: "Could not save vote" },
+      { status: 500 },
+    );
+  }
+
+  // Invalidate the public CDN-cached food list.
+  revalidatePath(`/api/canteens/${foodItem.canteen_id}/food`);
+
+  return NextResponse.json(
+    {
+      success: true,
+      vote,
+    },
+    {
+      headers: {
+        "Cache-Control": "private, no-store",
+      },
+    },
+  );
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ "item-id": string }> },
+) {
+  const supabase = await createClient();
+  const { "item-id": foodItemId } = await params;
+
+  // Check authentication
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 },
+    );
+  }
+
+  // Find food item + canteen
+  const { data: foodItem, error: foodItemError } = await supabase
+    .from("food_items")
+    .select("id, canteen_id")
+    .eq("id", foodItemId)
+    .single();
+
+  if (foodItemError || !foodItem) {
+    return NextResponse.json(
+      { error: "Food item not found" },
+      { status: 404 },
+    );
+  }
+
+  // Remove user's vote
+  const { error: deleteError } = await supabase
+    .from("food_votes")
+    .delete()
+    .eq("food_item_id", foodItemId)
+    .eq("user_id", user.id);
+
+  if (deleteError) {
+    console.error("FOOD VOTE DELETE ERROR:", deleteError);
+
+    return NextResponse.json(
+      { error: "Could not remove vote" },
+      { status: 500 },
+    );
+  }
+
+  // Invalidate public food cache
+  revalidatePath(`/api/canteens/${foodItem.canteen_id}/food`);
+
+  return NextResponse.json(
+    {
+      success: true,
+    },
+    {
+      headers: {
+        "Cache-Control": "private, no-store",
+      },
+    },
+  );
 }

@@ -1,30 +1,23 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import redis from "@/lib/redis/redis";
+import { cachedResponse } from "@/lib/cache-response";
+import { checkRateLimit } from "@/lib/redis/rate-limit";
 
-export async function GET() {
-  const cacheKey = "spots:all";
+export async function GET(request: Request) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
-  // Check Redis
-  try {
-    const cached = await redis.get<{ spots: unknown[] }>(cacheKey);
+  // 2. Check rate limit
+  const { success, headers: rateLimitHeaders } = await checkRateLimit(ip);
 
-    if (cached) {
-      console.log("REDIS HIT");
-
-      return NextResponse.json(cached, {
-        headers: {
-          "X-Cache": "HIT",
-        },
-      });
-    }
-
-    console.log("REDIS MISS");
-  } catch (error) {
-    console.error("Error fetching spots from Redis:", error);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: rateLimitHeaders,
+      },
+    );
   }
-
-  // Get from Supabase
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -55,9 +48,11 @@ export async function GET() {
     .eq("icons.is_active", true);
 
   if (error) {
+    console.error("SUPABASE GET ERROR:", error);
+
     return NextResponse.json(
       { error: "Could not load spots" },
-      { status: 500 },
+      { status: 500, headers: rateLimitHeaders },
     );
   }
 
@@ -78,24 +73,12 @@ export async function GET() {
       : (row.icons ?? null),
   }));
 
-  const response = {
-    spots,
-  };
+  const response = cachedResponse({ spots }, "spots");
 
-  // Save to Redis
-  try {
-    await redis.set(cacheKey, response, {
-      ex: 300,
-    });
-
-    console.log("SAVED TO REDIS");
-  } catch (error) {
-    console.error("Error saving spots to Redis:", error);
-  }
-
-  return NextResponse.json(response, {
-    headers: {
-      "X-Cache": "MISS",
-    },
+  // 6. Add rate-limit headers
+  Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
   });
+
+  return response;
 }

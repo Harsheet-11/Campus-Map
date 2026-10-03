@@ -18,7 +18,7 @@ export default function LoreDialog() {
     >
       <DialogContent
         showCloseButton={false}
-        className="p-0 border-0 bg-transparent shadow-none"
+        className="border-0 bg-transparent p-0 shadow-none"
       >
         {selectedLore && (
           <LoreSheet
