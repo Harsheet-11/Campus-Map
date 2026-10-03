@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLoreStore } from "@/stores/loreSpotStore";
 import { SCARE_ASSETS, stopScareAudio } from "@/hooks/scarePreloader";
 
@@ -22,11 +23,13 @@ export default function ScareOverlay() {
       {/* Jump scare */}
       {scarePhase === "SCARE" && (
         <div className="flex h-full w-full items-center justify-center overflow-hidden bg-black">
-          <img
+          <Image
             src={SCARE_ASSETS.image}
             alt=""
             aria-hidden="true"
             draggable={false}
+            fill
+            sizes="100vw"
             className="h-full w-full select-none object-cover"
             style={{ animation: "scare-shake 0.12s linear infinite" }}
           />
@@ -44,15 +47,17 @@ export default function ScareOverlay() {
             px-6 text-white
           "
         >
-          <img
+          <Image
             src={SCARE_ASSETS.roastImage}
             alt="Behen dar gayi?"
+            width={800}
+            height={600}
             draggable={false}
             className="
-              max-h-[65vh] max-w-[90vw] select-none
-              rounded-2xl object-contain
-              shadow-[0_0_50px_rgba(255,255,255,0.12)]
-            "
+    max-h-[65vh] max-w-[90vw] select-none
+    rounded-2xl object-contain
+    shadow-[0_0_50px_rgba(255,255,255,0.12)]
+  "
           />
 
           <p className="text-center text-3xl font-black tracking-wide sm:text-4xl">

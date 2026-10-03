@@ -10,7 +10,7 @@ import { useGeneralSpotStore } from "@/stores/generalSpotStore";
 
 export default function SpotMarker({ spot }: { spot: PermanentSpot }) {
   
-  const icon = useMemo(() => createSpotIcon(spot), [spot.id]);
+  const icon = useMemo(() => createSpotIcon(spot), [spot]);
 
   const setSelectedSpot = useGeneralSpotStore((state) => state.setSelectedSpot);
 
