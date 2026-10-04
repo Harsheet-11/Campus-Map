@@ -2,44 +2,42 @@ const SCARE_IMAGE = "/scare.webp";
 const SCARE_AUDIO = "/scare-audio.mp3";
 const ROAST_IMAGE = "/meme.webp";
 
+let scareImage: HTMLImageElement | null = null;
+let roastImage: HTMLImageElement | null = null;
 let audio: HTMLAudioElement | null = null;
-
-let imageReady = false;
-let roastImageReady = false;
 
 export function preloadScareAssets() {
   if (typeof window === "undefined") return;
 
-  if (!imageReady) {
-    const image = new Image();
-
-    image.onload = () => {
-      imageReady = true;
-    };
-
-    image.src = SCARE_IMAGE;
+  // Preload scare image
+  if (!scareImage) {
+    scareImage = new Image();
+    scareImage.decoding = "sync";
+    scareImage.src = SCARE_IMAGE;
   }
 
-  if (!roastImageReady) {
-    const image = new Image();
-
-    image.onload = () => {
-      roastImageReady = true;
-    };
-
-    image.src = ROAST_IMAGE;
+  // Preload roast image
+  if (!roastImage) {
+    roastImage = new Image();
+    roastImage.decoding = "sync";
+    roastImage.src = ROAST_IMAGE;
   }
 
+  // Preload audio
   if (!audio) {
-    audio = new Audio();
-
-    audio.src = SCARE_AUDIO;
+    audio = new Audio(SCARE_AUDIO);
     audio.preload = "auto";
     audio.volume = 1;
-
-    // Ask browser to load it now.
     audio.load();
   }
+}
+
+export function getScareImage(): HTMLImageElement | null {
+  return scareImage;
+}
+
+export function getRoastImage(): HTMLImageElement | null {
+  return roastImage;
 }
 
 export function getScareAudio(): HTMLAudioElement {

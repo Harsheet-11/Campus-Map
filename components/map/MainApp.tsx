@@ -1,10 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+
 import AppDialog from "@/components/backgroundBlur/AppDialog";
 import ProfileIcon from "@/components/profile/ProfileIcon";
 import ProfileLoader from "@/components/profile/ProfileLoader";
 import ProfileSetupManager from "@/components/profile/ProfileSetupManager";
 import ScareOverlay from "@/components/features/lore/scare/ScareOverlay";
+import { preloadScareAssets } from "@/hooks/scarePreloader";
 // import LocationButton from "@/components/location/locationButton";
 
 import dynamic from "next/dynamic";
@@ -24,6 +27,10 @@ const MapShell = dynamic(
 );
 
 export default function MainApp() {
+  useEffect(() => {
+    preloadScareAssets();
+  }, []);
+  
   return (
     <>
       <MapShell />
